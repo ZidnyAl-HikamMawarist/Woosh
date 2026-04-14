@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "676430540085",
+    "project_id": "wooshh-43000",
+    "storage_bucket": "wooshh-43000.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:676430540085:android:a25e3a44b5939d4c47f07c",
+        "android_client_info": {
+          "package_name": "com.example.woosh"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWS_EXvet58lnGQ08LN6PmNZCD-6BPFlY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
