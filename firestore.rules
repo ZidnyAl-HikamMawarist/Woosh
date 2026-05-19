@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users Collection: Users can only access and modify their own data
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+      
+      // Tickets subcollection
+      match /tickets/{ticketId} {
+        allow read, write: if isOwner(userId);
+      }
+      
+      // Point history subcollection
+      match /point_history/{historyId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Notifications subcollection
+      match /notifications/{notifId} {
+        allow read, write: if isOwner(userId);
+      }
+
+      // Saved passengers subcollection
+      match /saved_passengers/{passengerId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Trips Collection: Contains available train schedules
+    match /trips/{tripId} {
+      // Authenticated users can read available trips
+      allow read: if isAuthenticated();
+      
+      // No client writes allowed — trips are managed by Laravel admin via service account
+      allow write: if false;
+    }
+  }
+}

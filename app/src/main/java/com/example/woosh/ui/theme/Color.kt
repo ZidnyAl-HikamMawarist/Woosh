@@ -11,9 +11,13 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 // --- WOOSH THEME COLORS ---
-val ElegantDark = Color(0xFF1A1817) // Elegant Dark slightly warm black
-val PrimaryGold = Color(0xFFCBA052) // Classic sophisticated gold
-val OffWhite = Color(0xFFFAF9F6) // Classy warm white/cream background
+
+val PrimaryGold = Color(0xFFCBA052) // Keeping for legacy/accents
+val OffWhite = Color(0xFFF8F9FA) // Cleaner light grey/white background
 val SurfaceWhite = Color(0xFFFFFFFF)
-val TextPrimary = Color(0xFF1A1817)
-val TextSecondary = Color(0xFFB89947) // Secondary darker gold for accents
+val TextPrimary = Color(0xFF1A1A1A)
+val TextSecondary = Color(0xFF666666) // More neutral grey
+val WooshRed = Color(0xFFE31E24) // Brighter, more vibrant Whoosh red
+val WooshRedLight = Color(0xFFFFEBEB) // Very light red for backgrounds
+val WooshRedDark = Color(0xFFB3151A) // Darker red for contrast
+val DividerColor = Color(0xFFEEEEEE)

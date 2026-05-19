@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-dim": "#dadada",
+                        "secondary-container": "#e4e2e1",
+                        "outline-variant": "#e9bcb6",
+                        "on-secondary-container": "#656464",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#f6f7f7",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#e8e8e8",
+                        "tertiary": "#575959",
+                        "on-primary-container": "#fff5f3",
+                        "secondary": "#5f5e5e",
+                        "on-secondary-fixed-variant": "#474747",
+                        "surface-container": "#eeeeee",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "inverse-surface": "#2f3131",
+                        "primary-fixed": "#ffdad5",
+                        "surface-container-highest": "#e2e2e2",
+                        "tertiary-container": "#707171",
+                        "surface-tint": "#c0000c",
+                        "on-surface-variant": "#5e3f3b",
+                        "inverse-on-surface": "#f1f1f1",
+                        "primary-container": "#e30613",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#e4e2e1",
+                        "surface-bright": "#f9f9f9",
+                        "primary": "#b5000b",
+                        "surface-container-low": "#f3f3f3",
+                        "on-surface": "#1a1c1c",
+                        "surface": "#f9f9f9",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#930007",
+                        "on-background": "#1a1c1c",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "background": "#f9f9f9",
+                        "surface-variant": "#e2e2e2",
+                        "outline": "#936e69",
+                        "on-primary-fixed": "#410001",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#ffb4aa",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "primary-fixed-dim": "#ffb4aa"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "stack-lg": "24px",
+                        "base": "8px",
+                        "margin-tablet": "32px",
+                        "gutter": "16px",
+                        "margin-mobile": "20px",
+                        "stack-md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9f9; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-margin-mobile h-16 sticky top-0 z-50 bg-surface shadow-md">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-secondary">Halo,</p>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Aditya Pratama</h1>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:opacity-90 transition-opacity active:scale-95 transition-transform text-primary">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="flex flex-col gap-stack-lg mt-stack-md">
+<!-- Section 1: Promo Banners (Asymmetric Layout) -->
+<section class="px-margin-mobile">
+<div class="flex overflow-x-auto gap-stack-md hide-scrollbar snap-x">
+<div class="snap-center shrink-0 w-[85%] aspect-[16/8] rounded-xl overflow-hidden relative shadow-md">
+<img class="w-full h-full object-cover" data-alt="A high-speed sleek aerodynamic train speeding through a modern Indonesian landscape at sunset. The lighting is warm and golden, reflecting off the polished metallic surface of the train. The visual style is premium and corporate, featuring a clean minimalist aesthetic with subtle red accents that align with the Whoosh brand identity. The mood is energetic yet smooth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFaZ6w0FgsVjTmNnOkCCdz4aUc_wWggYyDHCQCYyXIBV712e8uVovzP7UxWoYHINW7-OHOHWWHOuFH2x3HBhiBypYJEhjM0teUASwtTS_nNQ-r829PFy1boB5d_Nkv9ultD4b8knPLEZPLT4EMkdzSdP2KT7WqhRV5-ZYkyrEqgPLlPxnha5_bnZAOCqjiwd7qCyELLnKdKShO0yCoDNrjFXo_IMpFZ0N3G4CtbQzjrPk0--mHpUPMZN7ictg2dgp0Nrkbp4z96lc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-4">
+<p class="font-label-sm text-label-sm text-white opacity-80">PROMO MERDEKA</p>
+<h3 class="font-headline-md text-headline-md text-white font-bold">Diskon 17% Semua Rute</h3>
+</div>
+</div>
+<div class="snap-center shrink-0 w-[85%] aspect-[16/8] rounded-xl overflow-hidden relative shadow-md">
+<img class="w-full h-full object-cover" data-alt="Interior of a luxury high-speed train cabin showing spacious ergonomic seating and large windows. The lighting is bright and natural, creating a clean light-mode atmosphere. The color palette consists of soft greys and whites with professional red branding details. The scene conveys a sense of premium speed and comfort for business travelers." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgMWjbxDaFl1DDmEjzBB7B4kg76HR-8o_lOm6BvyODIH44YdIJu-mcu_O8jmguUZ3rCiW-B-nD0i4h6TdLNQItUJBFhWNX-gGVmZg5gMGJDuFKY4dDY9DtZNzEltxHmhy-EtPN0m7NJx9CN1_Ot_f4z8It9a_8GD4sp6qWpIKhJCxN9_mCKaXrg9Qlo8lcJlVpAaFLvFGG___mqWtEFWka232CUtuWzcFmcHYYWe9hHVh1fA0g01-Jy0iHCbRaBjv38Y-tlb0F_Ts"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex flex-col justify-end p-4">
+<p class="font-label-sm text-label-sm text-white opacity-80">FIRST CLASS</p>
+<h3 class="font-headline-md text-headline-md text-white font-bold">Pengalaman Mewah Di Atas Rel</h3>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Fast Booking Form -->
+<section class="px-margin-mobile">
+<div class="bg-surface-container-lowest p-stack-md rounded-xl shadow-md border border-outline-variant/30">
+<h2 class="font-label-md text-label-md text-secondary mb-stack-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-size: 20px;">train</span>
+                    Booking Cepat
+                </h2>
+<div class="flex flex-col gap-4">
+<div class="relative flex flex-col gap-2">
+<div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-lg border border-outline-variant/20">
+<span class="material-symbols-outlined text-secondary">location_on</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">Asal</span>
+<span class="font-body-md text-body-md font-bold">Halim, Jakarta</span>
+</div>
+</div>
+<div class="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 bg-primary rounded-full flex items-center justify-center text-white shadow-md">
+<span class="material-symbols-outlined" style="font-size: 18px;">swap_vert</span>
+</div>
+<div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-lg border border-outline-variant/20">
+<span class="material-symbols-outlined text-secondary">near_me</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">Tujuan</span>
+<span class="font-body-md text-body-md font-bold">Tegalluar, Bandung</span>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-lg border border-outline-variant/20">
+<span class="material-symbols-outlined text-secondary">calendar_today</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">Tanggal</span>
+<span class="font-body-md text-body-md font-bold">24 Okt 2023</span>
+</div>
+</div>
+<div class="flex items-center gap-3 p-3 bg-surface-container-low rounded-lg border border-outline-variant/20">
+<span class="material-symbols-outlined text-secondary">group</span>
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">Penumpang</span>
+<span class="font-body-md text-body-md font-bold">1 Dewasa</span>
+</div>
+</div>
+</div>
+<button class="w-full bg-primary-container text-on-primary py-4 rounded-lg font-bold hover:opacity-90 transition-opacity active:scale-[0.98] transition-transform">
+                        Cari Jadwal Kereta
+                    </button>
+</div>
+</div>
+</section>
+<!-- Section 3: Active Journey Status -->
+<section class="px-margin-mobile">
+<div class="bg-primary/5 border-l-4 border-primary p-4 rounded-r-xl shadow-sm flex items-center justify-between">
+<div class="flex flex-col gap-1">
+<p class="font-label-sm text-label-sm text-primary font-bold">PERJALANAN AKTIF</p>
+<div class="flex items-center gap-2">
+<span class="font-body-md text-body-md font-bold">G1234</span>
+<span class="w-1 h-1 rounded-full bg-secondary"></span>
+<span class="font-body-md text-body-md">14:30 - 15:15</span>
+</div>
+</div>
+<div class="bg-primary text-white p-2 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="confirmation_number">confirmation_number</span>
+</div>
+</div>
+</section>
+<!-- Section 4: Main Menu Grid -->
+<section class="px-margin-mobile pb-8">
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface mb-4">Layanan Utama</h2>
+<div class="grid grid-cols-4 gap-4">
+<div class="flex flex-col items-center gap-2">
+<div class="w-14 h-14 bg-surface-container-highest rounded-2xl flex items-center justify-center text-primary shadow-sm active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-size: 28px;">confirmation_number</span>
+</div>
+<span class="font-label-sm text-label-sm text-center">Beli Tiket</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-14 h-14 bg-surface-container-highest rounded-2xl flex items-center justify-center text-primary shadow-sm active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-size: 28px;">history</span>
+</div>
+<span class="font-label-sm text-label-sm text-center">Riwayat</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-14 h-14 bg-surface-container-highest rounded-2xl flex items-center justify-center text-primary shadow-sm active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-size: 28px;">help_center</span>
+</div>
+<span class="font-label-sm text-label-sm text-center">Bantuan</span>
+</div>
+<div class="flex flex-col items-center gap-2">
+<div class="w-14 h-14 bg-surface-container-highest rounded-2xl flex items-center justify-center text-primary shadow-sm active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-size: 28px;">local_offer</span>
+</div>
+<span class="font-label-sm text-label-sm text-center">Promo</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface-container-lowest shadow-md dark:border-t dark:border-outline-variant h-16">
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed font-bold hover:bg-surface-container-low transition-colors active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low transition-colors active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="confirmation_number">confirmation_number</span>
+<span class="font-label-sm text-label-sm">My Tickets</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low transition-colors active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="history">history</span>
+<span class="font-label-sm text-label-sm">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:bg-surface-container-low transition-colors active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+</body></html>

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#f9f9f9",
+                    "on-primary-fixed": "#410001",
+                    "inverse-on-surface": "#f1f1f1",
+                    "primary": "#b5000b",
+                    "surface-tint": "#c0000c",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#dadada",
+                    "inverse-surface": "#2f3131",
+                    "surface-container": "#eeeeee",
+                    "on-secondary-fixed": "#1b1c1c",
+                    "tertiary-fixed": "#e2e2e2",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#e4e2e1",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-primary-fixed-variant": "#930007",
+                    "on-background": "#1a1c1c",
+                    "on-tertiary-container": "#f6f7f7",
+                    "secondary-container": "#e4e2e1",
+                    "surface-bright": "#f9f9f9",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "outline": "#936e69",
+                    "tertiary-container": "#707171",
+                    "surface-container-high": "#e8e8e8",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#e9bcb6",
+                    "on-secondary-fixed-variant": "#474747",
+                    "on-surface-variant": "#5e3f3b",
+                    "on-primary-container": "#fff5f3",
+                    "secondary": "#5f5e5e",
+                    "surface-container-low": "#f3f3f3",
+                    "surface-variant": "#e2e2e2",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "on-error": "#ffffff",
+                    "on-surface": "#1a1c1c",
+                    "primary-container": "#e30613",
+                    "tertiary": "#575959",
+                    "secondary-fixed-dim": "#c8c6c6",
+                    "primary-fixed": "#ffdad5",
+                    "on-secondary-container": "#656464",
+                    "error": "#ba1a1a",
+                    "on-error": "#ffffff",
+                    "on-surface": "#1a1c1c",
+                    "primary-container": "#e30613",
+                    "tertiary": "#575959",
+                    "secondary-fixed-dim": "#c8c6c6",
+                    "primary-fixed": "#ffdad5",
+                    "on-secondary-container": "#656464",
+                    "error": "#ba1a1a",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#ffb4aa",
+                    "inverse-primary": "#ffb4aa",
+                    "background": "#f9f9f9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "base": "8px",
+                    "stack-lg": "24px",
+                    "margin-tablet": "32px",
+                    "stack-sm": "8px",
+                    "stack-md": "16px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .perforated-edge {
+            background-image: radial-gradient(circle, #f9f9f9 8px, transparent 8px);
+            background-size: 24px 24px;
+            background-position: -12px -12px;
+            height: 12px;
+            width: 100%;
+        }
+        .ticket-shadow {
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style data-stitch-cursor=""></style><style data-stitch-scroll-lock=""></style></head>
+<body class="bg-surface font-body-md text-on-surface">
+<!-- Top App Bar -->
+<header class="flex justify-between items-center w-full px-margin-mobile h-16 sticky top-0 z-50 bg-surface shadow-md">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">E-Tiket</h1>
+</div>
+<button class="active:scale-95 transition-transform hover:opacity-90 transition-opacity">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</button>
+</header>
+<main class="max-w-[480px] mx-auto px-margin-mobile py-stack-lg pb-32">
+<!-- Ticket Container -->
+<div class="ticket-shadow bg-surface-container-lowest rounded-xl overflow-hidden">
+<!-- Ticket Header Section (QR Core) -->
+<div class="p-6 flex flex-col items-center border-b border-dashed border-outline-variant"><div class="w-full flex justify-between items-start mb-8"><div class="flex flex-col"><span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider mb-1">Kode Booking</span><span class="font-display-lg text-primary leading-none">WH88JK</span></div><div class=""><img alt="Ticket QR Code" class="w-10 h-10" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBO7fl9FyeA-m1Z_AeHdYXx3o6VO1cKhTTTVwkNy-EgtXXAsSV_DMxhUAxNnFAu79fjGnFWNZUMXqOYbf8e8zcrrPCVEIKN1rwjkuz9SaJaP6y6kAmGCidYKtFsOCH4_ZHOlwqzzNatI5a6ozs9wRtCrLuNyD10jQa9ViDG135L1tbOtRvO0N_oU7NXwYpXit_wVjUlonU9_97ZWNt9MGubGgKGLZSJtYgSyERPvWmU06k_RTaQepHfu-qLFL-BNrhrQ_FvDWlHRQM"/></div></div><div class="relative flex justify-center items-center w-full aspect-square max-w-[240px] mx-auto mb-8 rounded-2xl"><img alt="Large QR Code" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCawlgBS6wYFg5si83RBjae07V2AgQ-knA9SLlPAK0LWbLoT_-f0zvaOah2gkhxg4R0jIivHm1Gq0UoKnc3-TAaC67D1CvUAEIa2hNAJ_Bl2xtnDsFVYhKUNy0nxwQM4RdPPOlIJPUACQaztKYYytosxLNKzy6mguYz_KL6HLxnsdoejXtiaJ37gexKg9Jyud26DzQT935OFXJ8t8AtzoGdNkLCbceDisk3p2sZmYkN3Lux6oMpEwA8GjSO1HVR9vKGn6I5s50vj7w"/></div><div class="text-center"><p class="font-body-md text-on-surface font-medium">Tunjukkan QR ke petugas gate</p><p class="font-label-sm text-secondary mt-1">Scan barcode pada gate masuk stasiun</p></div></div>
+<!-- Perforated Edge Metaphor -->
+<div class="relative h-4 bg-surface-container-lowest flex items-center">
+<div class="absolute -left-3 w-6 h-6 bg-surface rounded-full"></div>
+<div class="w-full border-t border-dashed border-outline-variant mx-4"></div>
+<div class="absolute -right-3 w-6 h-6 bg-surface rounded-full"></div>
+</div>
+<!-- Ticket Details Section -->
+<div class="p-6">
+<!-- Passenger Info -->
+<div class="mb-stack-md">
+<span class="font-label-sm text-label-sm text-secondary">Nama Penumpang</span>
+<p class="font-body-lg text-body-lg font-bold text-on-surface">ADITAMA PRATAMA</p>
+</div>
+<!-- Train Info -->
+<div class="grid grid-cols-2 gap-gutter mb-stack-md">
+<div>
+<span class="font-label-sm text-label-sm text-secondary">Nomor Kereta</span>
+<p class="font-body-md text-body-md font-bold">Whoosh G1204</p>
+</div>
+<div class="text-right">
+<span class="font-label-sm text-label-sm text-secondary">Gerbong &amp; Kursi</span>
+<p class="font-body-md text-body-md font-bold">Coach 4, 12A</p>
+</div>
+</div>
+<!-- Journey Timeline -->
+<div class="flex items-start gap-4 mb-stack-md relative">
+<div class="flex flex-col items-center">
+<div class="w-3 h-3 rounded-full bg-primary mt-1"></div>
+<div class="w-0.5 h-16 bg-outline-variant my-1"></div>
+<div class="w-3 h-3 rounded-full border-2 border-primary bg-white mb-1"></div>
+</div>
+<div class="flex-1 flex flex-col justify-between h-[104px]">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-body-md text-body-md font-bold">Halim, Jakarta</p>
+<p class="font-label-sm text-label-sm text-secondary">Keberangkatan: 08:30 WIB</p>
+</div>
+<span class="font-label-md text-label-md text-primary font-bold">START</span>
+</div>
+<div class="flex justify-between items-end">
+<div>
+<p class="font-body-md text-body-md font-bold">Padalarang, Bandung</p>
+<p class="font-label-sm text-label-sm text-secondary">Kedatangan: 08:58 WIB</p>
+</div>
+<span class="font-label-md text-label-md text-secondary font-bold">END</span>
+</div>
+</div>
+</div>
+<div class="mt-stack-lg grid grid-cols-1 gap-3">
+<button class="bg-primary-container text-on-primary font-bold py-3 rounded-lg flex items-center justify-center gap-2 active:scale-95 transition-transform hover:opacity-90">
+<span class="material-symbols-outlined text-[20px]">download</span>
+<span class="font-label-md text-label-md">Download PDF</span>
+</button>
+<button class="bg-white border border-primary text-primary font-bold py-3 rounded-lg flex items-center justify-center gap-2 active:scale-95 transition-transform hover:opacity-90">
+<span class="material-symbols-outlined text-[20px]">qr_code_scanner</span>
+<span class="font-label-md text-label-md">QR Feeder</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Info Note -->
+<div class="mt-stack-md p-4 bg-surface-container border-l-4 border-primary">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-primary">info</span>
+<p class="font-label-sm text-label-sm text-on-surface">Harap tiba di stasiun sekurangnya 30 menit sebelum waktu keberangkatan untuk proses screening keamanan.</p>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface-container-lowest shadow-md">
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container-low transition-colors active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-sm text-label-sm">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary font-bold hover:bg-surface-container-low transition-colors active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">confirmation_number</span>
+<span class="font-label-sm text-label-sm">My Tickets</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container-low transition-colors active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">history</span>
+<span class="font-label-sm text-label-sm">History</span>
+</a>
+<a class="flex flex-col items-center justify-center text-secondary hover:bg-surface-container-low transition-colors active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</a>
+</nav>
+</body></html>

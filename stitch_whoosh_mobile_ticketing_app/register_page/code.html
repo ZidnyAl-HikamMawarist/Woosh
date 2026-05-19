@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-dim": "#dadada",
+                    "secondary-container": "#e4e2e1",
+                    "outline-variant": "#e9bcb6",
+                    "on-secondary-container": "#656464",
+                    "on-error-container": "#93000a",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#f6f7f7",
+                    "on-tertiary": "#ffffff",
+                    "on-error": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-container-high": "#e8e8e8",
+                    "tertiary": "#575959",
+                    "on-primary-container": "#fff5f3",
+                    "secondary": "#5f5e5e",
+                    "on-secondary-fixed-variant": "#474747",
+                    "surface-container": "#eeeeee",
+                    "tertiary-fixed": "#e2e2e2",
+                    "on-secondary-fixed": "#1b1c1c",
+                    "inverse-surface": "#2f3131",
+                    "primary-fixed": "#ffdad5",
+                    "surface-container-highest": "#e2e2e2",
+                    "tertiary-container": "#707171",
+                    "surface-tint": "#c0000c",
+                    "on-surface-variant": "#5e3f3b",
+                    "inverse-on-surface": "#f1f1f1",
+                    "primary-container": "#e30613",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed": "#e4e2e1",
+                    "surface-bright": "#f9f9f9",
+                    "primary": "#b5000b",
+                    "surface-container-low": "#f3f3f3",
+                    "on-surface": "#1a1c1c",
+                    "surface": "#f9f9f9",
+                    "error-container": "#ffdad6",
+                    "on-primary-fixed-variant": "#930007",
+                    "on-background": "#1a1c1c",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "background": "#f9f9f9",
+                    "surface-variant": "#e2e2e2",
+                    "outline": "#936e69",
+                    "on-primary-fixed": "#410001",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-primary": "#ffb4aa",
+                    "secondary-fixed-dim": "#c8c6c6",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "primary-fixed-dim": "#ffb4aa"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "stack-lg": "24px",
+                    "base": "8px",
+                    "margin-tablet": "32px",
+                    "gutter": "16px",
+                    "margin-mobile": "20px",
+                    "stack-md": "16px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "headline-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #f9f9f9;
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-margin-mobile h-16 sticky top-0 z-50 bg-surface shadow-md">
+<div class="flex items-center gap-4">
+<button class="text-primary hover:opacity-90 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Daftar Akun Baru</h1>
+</div>
+<div class="flex items-center">
+<button class="text-primary hover:opacity-90 transition-opacity active:scale-95 transition-transform">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow flex flex-col items-center justify-start py-stack-lg px-margin-mobile">
+<div class="w-full max-w-[600px] bg-surface-container-lowest rounded-xl shadow-md overflow-hidden flex flex-col">
+<!-- Hero Imagery Section -->
+<div class="relative h-48 w-full">
+<img alt="High Speed Rail Registration" class="w-full h-full object-cover" data-alt="A clean, cinematic photograph of a high-speed sleek train station with a minimalist design, emphasizing aerodynamic motion and technological precision. The lighting is bright and airy with soft white reflections on polished surfaces, mirroring a premium corporate travel aesthetic. Subtle accents of vibrant red from the railway brand punctuate the cool grey and white environment, creating a sense of professional speed and modern reliability." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBq-yKptJSEArsIHw7AwcrCygDuV5Hq6QzYcvxLJQKhJnCj4s3TK-reiF0NFqsdkmUe1nUkFy-HHkkhwU8w-6p3PG-TMx8gxilsLHeC9_VFi75l4yo2IEy_gewY_I4Aa5K1e6LdqnGUshmjsLjDQEaWpgy_e7S0w5gfCNVvPwjQLfMWWZsuMIBbKppOhE4ukqjBH4EzAXyoG2xd3aVvwSNeBlYPnGZHFuwu5_sfCpL_Pbul9zRnAJ5WDJ1irgR7gKKo2WZh4bQXpRc"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
+<p class="text-white font-headline-md text-headline-md">Mulai Perjalanan Anda</p>
+</div>
+</div>
+<!-- Registration Form -->
+<div class="p-6 md:p-8 flex flex-col gap-stack-md">
+<!-- Nama Lengkap -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-secondary">Nama Lengkap</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-secondary text-[20px]">person</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface-container-lowest border border-[#D1D1D1] rounded-lg focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none text-body-md font-body-md transition-all" placeholder="Masukkan nama sesuai KTP" type="text"/>
+</div>
+</div>
+<!-- NIK / Paspor -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-secondary">NIK atau No. Paspor</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-secondary text-[20px]">badge</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface-container-lowest border border-[#D1D1D1] rounded-lg focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none text-body-md font-body-md transition-all" placeholder="Contoh: 3273xxxxxxxxxxxx" type="text"/>
+</div>
+</div>
+<!-- Multi-field Grid for Mobile/Desktop -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-stack-md">
+<!-- Email -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-secondary">Alamat Email</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-secondary text-[20px]">mail</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface-container-lowest border border-[#D1D1D1] rounded-lg focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none text-body-md font-body-md transition-all" placeholder="email@contoh.com" type="email"/>
+</div>
+</div>
+<!-- Phone -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-secondary">No. Handphone</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-secondary text-[20px]">phone_iphone</span>
+<input class="w-full pl-10 pr-4 py-3 bg-surface-container-lowest border border-[#D1D1D1] rounded-lg focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none text-body-md font-body-md transition-all" placeholder="0812xxxxxxxx" type="tel"/>
+</div>
+</div>
+</div>
+<!-- Password -->
+<div class="flex flex-col gap-1">
+<label class="font-label-md text-label-md text-secondary">Kata Sandi</label>
+<div class="relative flex items-center">
+<span class="material-symbols-outlined absolute left-3 text-secondary text-[20px]">lock</span>
+<input class="w-full pl-10 pr-12 py-3 bg-surface-container-lowest border border-[#D1D1D1] rounded-lg focus:border-primary-container focus:ring-1 focus:ring-primary-container outline-none text-body-md font-body-md transition-all" placeholder="Minimal 8 karakter" type="password"/>
+<button class="absolute right-3 text-secondary">
+<span class="material-symbols-outlined">visibility</span>
+</button>
+</div>
+</div>
+<!-- Terms and Conditions -->
+<div class="flex items-start gap-3 mt-2">
+<div class="flex items-center h-5">
+<input class="h-5 w-5 rounded border-outline text-primary-container focus:ring-primary-container" type="checkbox"/>
+</div>
+<p class="font-label-sm text-label-sm text-secondary">
+                        Saya menyetujui <span class="text-primary font-bold">Syarat &amp; Ketentuan</span> serta <span class="text-primary font-bold">Kebijakan Privasi</span> Whoosh yang berlaku.
+                    </p>
+</div>
+<!-- Action Button -->
+<div class="mt-4">
+<button class="w-full py-4 bg-primary-container text-white font-bold rounded-lg shadow-sm hover:bg-[#c0000c] active:scale-[0.98] transition-all flex justify-center items-center gap-2">
+<span>Daftar Sekarang</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+<!-- Login Redirect -->
+<div class="mt-2 text-center">
+<p class="font-label-md text-label-md text-secondary">
+                        Sudah punya akun? <a class="text-primary font-bold" href="#">Masuk di sini</a>
+</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Space -->
+<footer class="py-stack-lg text-center px-margin-mobile">
+<p class="font-label-sm text-label-sm text-secondary-fixed-dim">© 2024 Whoosh - Kereta Cepat Indonesia China</p>
+</footer>
+</body></html>

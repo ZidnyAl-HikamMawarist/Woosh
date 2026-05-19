@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<title>Pembayaran - Whoosh</title>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#f9f9f9",
+                    "on-primary-fixed": "#410001",
+                    "inverse-on-surface": "#f1f1f1",
+                    "primary": "#b5000b",
+                    "surface-tint": "#c0000c",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#dadada",
+                    "inverse-surface": "#2f3131",
+                    "surface-container": "#eeeeee",
+                    "on-secondary-fixed": "#1b1c1c",
+                    "tertiary-fixed": "#e2e2e2",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#e4e2e1",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-primary-fixed-variant": "#930007",
+                    "on-background": "#1a1c1c",
+                    "on-tertiary-container": "#f6f7f7",
+                    "secondary-container": "#e4e2e1",
+                    "surface-bright": "#f9f9f9",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "outline": "#936e69",
+                    "tertiary-container": "#707171",
+                    "surface-container-high": "#e8e8e8",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#e9bcb6",
+                    "on-secondary-fixed-variant": "#474747",
+                    "on-surface-variant": "#5e3f3b",
+                    "on-primary-container": "#fff5f3",
+                    "secondary": "#5f5e5e",
+                    "surface-container-low": "#f3f3f3",
+                    "surface-variant": "#e2e2e2",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "on-error": "#ffffff",
+                    "on-surface": "#1a1c1c",
+                    "primary-container": "#e30613",
+                    "tertiary": "#575959",
+                    "secondary-fixed-dim": "#c8c6c6",
+                    "primary-fixed": "#ffdad5",
+                    "on-secondary-container": "#656464",
+                    "error": "#ba1a1a",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#ffb4aa",
+                    "inverse-primary": "#ffb4aa",
+                    "background": "#f9f9f9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "base": "8px",
+                    "stack-lg": "24px",
+                    "margin-tablet": "32px",
+                    "stack-sm": "8px",
+                    "stack-md": "16px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-shadow { box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.08); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface">
+<!-- Top Navigation Header -->
+<header class="flex justify-between items-center w-full px-margin-mobile h-16 sticky top-0 z-50 bg-surface shadow-md">
+<div class="flex items-center gap-4">
+<button class="text-primary hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Pembayaran</h1>
+</div>
+<div class="text-primary">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</div>
+</header>
+<main class="max-w-[1200px] mx-auto p-margin-mobile pb-32">
+<!-- Countdown Timer Section -->
+<section class="mb-stack-lg bg-primary-container text-on-primary-container p-4 rounded-xl flex items-center justify-between custom-shadow">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined" data-icon="schedule" style="font-variation-settings: 'FILL' 1;">schedule</span>
+<span class="font-label-md text-label-md">Selesaikan pembayaran dalam</span>
+</div>
+<span class="font-headline-md text-headline-md font-bold">14:59</span>
+</section>
+<!-- Order Summary (Small Info) -->
+<div class="mb-stack-lg p-4 bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-md text-label-md text-secondary">Total Tagihan</span>
+<span class="font-headline-md text-headline-md font-bold text-primary">Rp 600.000</span>
+</div>
+<div class="text-label-sm font-label-sm text-secondary">ID Pesanan: #WSH-8273615</div>
+</div>
+<!-- Payment Options Grid -->
+<div class="space-y-stack-lg">
+<!-- Virtual Account Group -->
+<section>
+<h2 class="font-label-md text-label-md text-on-surface mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="account_balance">account_balance</span>
+                    Virtual Account
+                </h2>
+<div class="space-y-2">
+<label class="flex items-center justify-between p-4 bg-surface-container-lowest border border-outline-variant rounded-xl cursor-pointer hover:border-primary transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-4">
+<div class="w-12 h-8 bg-surface-container flex items-center justify-center rounded">
+<span class="font-bold text-secondary text-xs">MANDIRI</span>
+</div>
+<span class="font-body-md text-body-md">Mandiri Virtual Account</span>
+</div>
+<input class="text-primary focus:ring-primary h-5 w-5" name="payment" type="radio"/>
+</label>
+<label class="flex items-center justify-between p-4 bg-surface-container-lowest border border-outline-variant rounded-xl cursor-pointer hover:border-primary transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-4">
+<div class="w-12 h-8 bg-surface-container flex items-center justify-center rounded">
+<span class="font-bold text-secondary text-xs">BNI</span>
+</div>
+<span class="font-body-md text-body-md">BNI Virtual Account</span>
+</div>
+<input class="text-primary focus:ring-primary h-5 w-5" name="payment" type="radio"/>
+</label>
+<label class="flex items-center justify-between p-4 bg-surface-container-lowest border border-outline-variant rounded-xl cursor-pointer hover:border-primary transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-4">
+<div class="w-12 h-8 bg-surface-container flex items-center justify-center rounded">
+<span class="font-bold text-secondary text-xs">BRI</span>
+</div>
+<span class="font-body-md text-body-md">BRI Virtual Account</span>
+</div>
+<input class="text-primary focus:ring-primary h-5 w-5" name="payment" type="radio"/>
+</label>
+</div>
+</section>
+<!-- E-Wallet Group -->
+<section>
+<h2 class="font-label-md text-label-md text-on-surface mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="account_balance_wallet">account_balance_wallet</span>
+                    E-Wallet &amp; QRIS
+                </h2>
+<div class="space-y-2">
+<label class="flex items-center justify-between p-4 bg-surface-container-lowest border border-outline-variant rounded-xl cursor-pointer hover:border-primary transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-4">
+<div class="w-12 h-8 bg-surface-container flex items-center justify-center rounded">
+<span class="material-symbols-outlined text-primary" data-icon="qr_code_2">qr_code_2</span>
+</div>
+<span class="font-body-md text-body-md">QRIS (Gopay, ShopeePay, etc)</span>
+</div>
+<input class="text-primary focus:ring-primary h-5 w-5" name="payment" type="radio"/>
+</label>
+<label class="flex items-center justify-between p-4 bg-surface-container-lowest border border-outline-variant rounded-xl cursor-pointer hover:border-primary transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-4">
+<div class="w-12 h-8 bg-surface-container flex items-center justify-center rounded">
+<span class="font-bold text-secondary text-xs">OVO</span>
+</div>
+<span class="font-body-md text-body-md">OVO</span>
+</div>
+<input class="text-primary focus:ring-primary h-5 w-5" name="payment" type="radio"/>
+</label>
+<label class="flex items-center justify-between p-4 bg-surface-container-lowest border border-outline-variant rounded-xl cursor-pointer hover:border-primary transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-4">
+<div class="w-12 h-8 bg-surface-container flex items-center justify-center rounded">
+<span class="font-bold text-secondary text-xs">DANA</span>
+</div>
+<span class="font-body-md text-body-md">DANA</span>
+</div>
+<input class="text-primary focus:ring-primary h-5 w-5" name="payment" type="radio"/>
+</label>
+</div>
+</section>
+<!-- Credit Card Group -->
+<section>
+<h2 class="font-label-md text-label-md text-on-surface mb-stack-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="credit_card">credit_card</span>
+                    Kartu Kredit
+                </h2>
+<label class="flex items-center justify-between p-4 bg-surface-container-lowest border border-outline-variant rounded-xl cursor-pointer hover:border-primary transition-colors active:scale-[0.98]">
+<div class="flex items-center gap-4">
+<div class="flex gap-1">
+<span class="material-symbols-outlined text-secondary" data-icon="credit_card">credit_card</span>
+</div>
+<span class="font-body-md text-body-md">Visa / Mastercard / JCB</span>
+</div>
+<input class="text-primary focus:ring-primary h-5 w-5" name="payment" type="radio"/>
+</label>
+</section>
+</div>
+<!-- Security Trust Badge -->
+<div class="mt-stack-lg flex flex-col items-center justify-center gap-2 text-secondary opacity-60">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="lock">lock</span>
+<span class="text-label-sm font-label-sm">Pembayaran Aman &amp; Terenkripsi</span>
+</div>
+<div class="flex gap-4">
+<img alt="Visa" class="h-4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEM3JclVax3tRLTzlhvNeyLKp2uSu7dYtfFhDUHiR5jBz1oCQlJC_lf1LOTXYpDXC5SHMlt7vsdNEGpFeDsEYus3gzflQnu_eRQ68JC-0KSqPzcOQZVkWjTodzWkLpJdCPPQWRXt8msy04lshCIViVi_ei_WkvFjvufv7k_HgjRxZlf6iEw8Hzvv6q5vr18zSVnOcuMrucX7LxgLnmhXKZBuwKFFDHhVvFS1keKJQDScb3P9LJlD1pqWSNufoh8prhOOISOQtLix0"/>
+<img alt="Mastercard" class="h-4" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCjmlBDc32JKyndg-0SSV0amMah84pevItiaYDHkzJIoFftamQmAo8annP6dNa5oR-d377Lio8pXEB3iwMffL2k_XQTBfZtaCF6LijNeH8spvR1t7bV6VJXBOlwo0yAPLLRfBLh4YMxqktfoWV1XUSuCb1A5pJlj-T6ZhkWGIrmQMHXL3eRGWLnMxN3WL5O74dZbSsukkvc8vVN_9f1hIuKC7JdD0Opaqt3w3hfQo0gGTgHW_umtPy9VgKl51dvOH9WSmuXggOEdJE"/>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest p-4 custom-shadow border-t border-outline-variant md:flex md:justify-center">
+<div class="w-full max-w-[1200px] flex flex-col gap-2">
+<button class="w-full bg-primary-container text-on-primary text-body-md font-bold py-4 rounded-xl shadow-md active:scale-95 transition-transform">
+                Bayar Sekarang
+            </button>
+</div>
+</div>
+</body></html>

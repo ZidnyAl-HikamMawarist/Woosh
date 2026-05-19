@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#f9f9f9",
+                    "on-primary-fixed": "#410001",
+                    "inverse-on-surface": "#f1f1f1",
+                    "primary": "#b5000b",
+                    "surface-tint": "#c0000c",
+                    "on-tertiary": "#ffffff",
+                    "surface-dim": "#dadada",
+                    "inverse-surface": "#2f3131",
+                    "surface-container": "#eeeeee",
+                    "on-secondary-fixed": "#1b1c1c",
+                    "tertiary-fixed": "#e2e2e2",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#e4e2e1",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-primary-fixed-variant": "#930007",
+                    "on-background": "#1a1c1c",
+                    "on-tertiary-container": "#f6f7f7",
+                    "secondary-container": "#e4e2e1",
+                    "surface-bright": "#f9f9f9",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "outline": "#936e69",
+                    "tertiary-container": "#707171",
+                    "surface-container-high": "#e8e8e8",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "outline-variant": "#e9bcb6",
+                    "on-secondary-fixed-variant": "#474747",
+                    "on-surface-variant": "#5e3f3b",
+                    "on-primary-container": "#fff5f3",
+                    "secondary": "#5f5e5e",
+                    "surface-container-low": "#f3f3f3",
+                    "surface-variant": "#e2e2e2",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "on-error": "#ffffff",
+                    "on-surface": "#1a1c1c",
+                    "primary-container": "#e30613",
+                    "tertiary": "#575959",
+                    "secondary-fixed-dim": "#c8c6c6",
+                    "primary-fixed": "#ffdad5",
+                    "on-secondary-container": "#656464",
+                    "error": "#ba1a1a",
+                    "on-primary": "#ffffff",
+                    "primary-fixed-dim": "#ffb4aa",
+                    "inverse-primary": "#ffb4aa",
+                    "background": "#f9f9f9"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "base": "8px",
+                    "stack-lg": "24px",
+                    "margin-tablet": "32px",
+                    "stack-sm": "8px",
+                    "stack-md": "16px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      body { font-family: 'Inter', sans-serif; }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .ticket-dashed {
+        background-image: linear-gradient(to right, #D1D1D1 50%, rgba(255, 255, 255, 0) 0%);
+        background-position: bottom;
+        background-size: 8px 1px;
+        background-repeat: repeat-x;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-margin-mobile h-16 sticky top-0 z-50 bg-surface shadow-md dark:bg-surface-container">
+<div class="flex items-center gap-4">
+<button class="hover:opacity-90 transition-opacity active:scale-95 transition-transform text-primary">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Ringkasan Pesanan</h1>
+</div>
+<button class="hover:opacity-90 transition-opacity active:scale-95 transition-transform text-primary">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</header>
+<main class="max-w-md mx-auto p-margin-mobile flex flex-col gap-stack-lg">
+<!-- Section 1: Trip Details -->
+<section class="flex flex-col gap-stack-sm">
+<h2 class="font-label-md text-label-md text-secondary px-1 uppercase tracking-wider">Detail Perjalanan</h2>
+<div class="bg-surface-container-lowest rounded-xl p-stack-md shadow-md border-l-4 border-primary-container">
+<div class="flex justify-between items-start mb-4">
+<div>
+<p class="font-label-sm text-label-sm text-secondary">Whoosh Kereta Cepat</p>
+<p class="font-headline-md text-headline-md text-primary font-bold">G1234</p>
+</div>
+<div class="text-right">
+<p class="font-label-sm text-label-sm text-secondary">Kamis, 24 Okt 2024</p>
+<p class="font-label-md text-label-md text-on-surface font-semibold">Premium Economy</p>
+</div>
+</div>
+<div class="flex items-stretch gap-4 relative py-2">
+<div class="flex flex-col items-center justify-between py-1">
+<span class="w-3 h-3 rounded-full border-2 border-primary bg-surface"></span>
+<div class="w-0.5 flex-grow bg-outline-variant my-1"></div>
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+</div>
+<div class="flex flex-col gap-8 flex-grow">
+<div class="flex justify-between">
+<div>
+<p class="font-body-md text-body-md font-bold">08:00</p>
+<p class="font-label-md text-label-md text-secondary">Halim, Jakarta</p>
+</div>
+</div>
+<div class="flex justify-between">
+<div>
+<p class="font-body-md text-body-md font-bold">08:45</p>
+<p class="font-label-md text-label-md text-secondary">Padalarang, Bandung</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Passenger Info -->
+<section class="flex flex-col gap-stack-sm">
+<h2 class="font-label-md text-label-md text-secondary px-1 uppercase tracking-wider">Informasi Penumpang</h2>
+<div class="bg-surface-container-lowest rounded-xl p-stack-md shadow-md overflow-hidden">
+<div class="flex items-center gap-4 mb-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface font-bold">Budi Santoso</p>
+<p class="font-label-sm text-label-sm text-secondary">NIK: 3275012345670001</p>
+</div>
+</div>
+<div class="ticket-dashed my-2 h-px w-full"></div>
+<div class="flex justify-between items-center pt-2">
+<span class="font-label-sm text-label-sm text-secondary">Kursi</span>
+<span class="font-label-md text-label-md text-primary font-bold">Gerbong 4, 12A</span>
+</div>
+</div>
+</section>
+<!-- Section 3: Price Details -->
+<section class="flex flex-col gap-stack-sm">
+<h2 class="font-label-md text-label-md text-secondary px-1 uppercase tracking-wider">Rincian Harga</h2>
+<div class="bg-surface-container-lowest rounded-xl p-stack-md shadow-md flex flex-col gap-stack-sm">
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md text-secondary">Tiket Dewasa (x1)</span>
+<span class="font-body-md text-body-md font-medium text-on-surface">Rp 300.000</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-body-md text-body-md text-secondary">Biaya Admin</span>
+<span class="font-body-md text-body-md font-medium text-on-surface">Rp 7.500</span>
+</div>
+<div class="ticket-dashed my-2 h-px w-full"></div>
+<div class="flex justify-between items-center">
+<span class="font-headline-md text-headline-md text-on-surface font-bold">Total Bayar</span>
+<span class="font-headline-md text-headline-md text-primary font-bold">Rp 307.500</span>
+</div>
+</div>
+</section>
+<!-- Promo Banner -->
+<div class="relative rounded-xl overflow-hidden aspect-[3/1] shadow-md">
+<img alt="High speed train interior" class="w-full h-full object-cover" data-alt="A cinematic, wide-angle interior shot of a futuristic high-speed train cabin with sleek red accents and minimalist white seating. The lighting is bright and clean, reflecting a professional corporate modern aesthetic. High-quality materials and soft textures are visible, creating a premium travel atmosphere. The color palette is dominated by pure whites and energetic reds, consistent with a high-end logistics brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPd_g_pPpUzmyxSDF-C_CIHEH7-k9gn1ob0FDiKicwXNSpClvkHdL_k5Kl7EaqzqTrmjsSjdGSfXAymGHvjm-0ZKAhjw4ro_7CWmqpNk-7fIyJ7SZGaxngq2230lZ9sDi6ve0Fsgi_gtPmq394uH0xWIjW3xATGA6rE6NSdlxn1nkMJskbqxNq7Wn0TZx-f9ar1FctkCLrK1T3Hh6SsDebtC9CUSkveZmA_X355ZoTrFl7GgQQnhK1_zzpA5FIrZ6dNIDHlT8UEuo"/>
+<div class="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex items-center p-6">
+<div class="text-white">
+<p class="font-label-md text-label-md font-bold">Diskon 10%</p>
+<p class="font-label-sm text-label-sm opacity-90">Untuk pemesanan berikutnya</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest p-margin-mobile shadow-[0_-8px_16px_rgba(0,0,0,0.05)] flex flex-col gap-3">
+<div class="flex items-center gap-2 px-1">
+<span class="material-symbols-outlined text-secondary scale-75">verified_user</span>
+<p class="font-label-sm text-label-sm text-secondary">Pembayaran aman dengan enkripsi SSL</p>
+</div>
+<button class="w-full bg-primary-container text-on-primary font-bold py-4 rounded-xl shadow-lg hover:opacity-90 active:scale-95 transition-all text-body-lg">
+            Bayar Sekarang
+        </button>
+</div>
+</body></html>

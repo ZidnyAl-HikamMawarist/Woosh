@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9f9f9;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .seat-selected {
+            background-color: #e30613;
+            color: white;
+            border-color: #e30613;
+        }
+        .seat-occupied {
+            background-color: #d1d1d1;
+            color: #5f5e5e;
+            border-color: #d1d1d1;
+            cursor: not-allowed;
+        }
+        .seat-available {
+            background-color: #ffffff;
+            border: 1px solid #d1d1d1;
+        }
+        .coach-container {
+            mask-image: linear-gradient(to bottom, black 90%, transparent 100%);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#f9f9f9",
+                        "on-primary-fixed": "#410001",
+                        "inverse-on-surface": "#f1f1f1",
+                        "primary": "#b5000b",
+                        "surface-tint": "#c0000c",
+                        "on-tertiary": "#ffffff",
+                        "surface-dim": "#dadada",
+                        "inverse-surface": "#2f3131",
+                        "surface-container": "#eeeeee",
+                        "on-secondary-fixed": "#1b1c1c",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed": "#e4e2e1",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-primary-fixed-variant": "#930007",
+                        "on-background": "#1a1c1c",
+                        "on-tertiary-container": "#f6f7f7",
+                        "secondary-container": "#e4e2e1",
+                        "surface-bright": "#f9f9f9",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "outline": "#936e69",
+                        "tertiary-container": "#707171",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "outline-variant": "#e9bcb6",
+                        "on-secondary-fixed-variant": "#474747",
+                        "on-surface-variant": "#5e3f3b",
+                        "on-primary-container": "#fff5f3",
+                        "secondary": "#5f5e5e",
+                        "surface-container-low": "#f3f3f3",
+                        "surface-variant": "#e2e2e2",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-error": "#ffffff",
+                        "on-surface": "#1a1c1c",
+                        "primary-container": "#e30613",
+                        "tertiary": "#575959",
+                        "secondary-fixed-dim": "#c8c6c6",
+                        "primary-fixed": "#ffdad5",
+                        "on-secondary-container": "#656464",
+                        "error": "#ba1a1a",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#ffb4aa",
+                        "inverse-primary": "#ffb4aa",
+                        "background": "#f9f9f9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "base": "8px",
+                        "stack-lg": "24px",
+                        "margin-tablet": "32px",
+                        "stack-sm": "8px",
+                        "stack-md": "16px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface">
+<!-- Top Navigation Anchor -->
+<header class="flex justify-between items-center w-full px-margin-mobile h-16 sticky top-0 z-50 bg-surface shadow-md">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary">arrow_back</span>
+</button>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Pilih Kursi</h1>
+<p class="font-label-sm text-label-sm text-secondary">G1204 • 24 Oct 2023</p>
+</div>
+</div>
+<div class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary">notifications</span>
+</div>
+</header>
+<main class="max-w-[1200px] mx-auto pb-32">
+<!-- Trip Summary Header -->
+<section class="px-margin-mobile py-stack-md bg-surface-container-low mb-stack-lg">
+<div class="flex justify-between items-center">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Keberangkatan</span>
+<span class="font-headline-md text-headline-md text-on-surface">Halim, Jakarta</span>
+</div>
+<span class="material-symbols-outlined text-primary">trending_flat</span>
+<div class="flex flex-col text-right">
+<span class="font-label-sm text-label-sm text-secondary uppercase tracking-wider">Tujuan</span>
+<span class="font-headline-md text-headline-md text-on-surface">Tegalluar, Bandung</span>
+</div>
+</div>
+</section>
+<!-- Legend Section -->
+<section class="px-margin-mobile mb-stack-lg">
+<div class="flex justify-between items-center bg-surface-container-lowest p-stack-md rounded-xl shadow-sm">
+<div class="flex items-center gap-2">
+<div class="w-5 h-5 rounded-sm seat-available"></div>
+<span class="font-label-sm text-label-sm">Tersedia</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-5 h-5 rounded-sm seat-selected"></div>
+<span class="font-label-sm text-label-sm">Dipilih</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-5 h-5 rounded-sm seat-occupied"></div>
+<span class="font-label-sm text-label-sm">Terisi</span>
+</div>
+</div>
+</section>
+<!-- Coach Selector & Travel Direction -->
+<section class="px-margin-mobile mb-stack-md">
+<div class="flex items-center justify-between mb-stack-sm">
+<h2 class="font-label-md text-label-md text-on-surface">Gerbong 4 (Premium Economy)</h2>
+<div class="flex items-center gap-2 text-secondary">
+<span class="font-label-sm text-label-sm">Arah Perjalanan</span>
+<span class="material-symbols-outlined text-[18px]">north</span>
+</div>
+</div>
+<!-- Coach Scroll Mini-Map -->
+<div class="flex gap-2 overflow-x-auto py-2 no-scrollbar">
+<div class="flex-shrink-0 w-12 h-8 rounded bg-surface-container border border-outline-variant flex items-center justify-center font-label-sm text-secondary">1</div>
+<div class="flex-shrink-0 w-12 h-8 rounded bg-surface-container border border-outline-variant flex items-center justify-center font-label-sm text-secondary">2</div>
+<div class="flex-shrink-0 w-12 h-8 rounded bg-surface-container border border-outline-variant flex items-center justify-center font-label-sm text-secondary">3</div>
+<div class="flex-shrink-0 w-12 h-8 rounded bg-primary-container border border-primary flex items-center justify-center font-label-sm text-on-primary-container font-bold shadow-sm">4</div>
+<div class="flex-shrink-0 w-12 h-8 rounded bg-surface-container border border-outline-variant flex items-center justify-center font-label-sm text-secondary">5</div>
+<div class="flex-shrink-0 w-12 h-8 rounded bg-surface-container border border-outline-variant flex items-center justify-center font-label-sm text-secondary">6</div>
+</div>
+</section>
+<!-- Seat Map Container -->
+<section class="px-margin-mobile">
+<div class="bg-surface-container-lowest rounded-t-[40px] border-x border-t border-outline-variant p-6 shadow-md relative">
+<!-- Train Nose Visual -->
+<div class="absolute -top-4 left-1/2 -translate-x-1/2 w-20 h-2 bg-surface-dim rounded-full"></div>
+<!-- Seat Grid 3-2 Layout -->
+<div class="grid grid-cols-6 gap-y-6 max-w-sm mx-auto">
+<!-- Column Headers -->
+<div class="text-center font-label-sm text-secondary">A</div>
+<div class="text-center font-label-sm text-secondary">B</div>
+<div class="text-center font-label-sm text-secondary">C</div>
+<div class="text-center font-label-sm text-secondary"></div> <!-- Aisle -->
+<div class="text-center font-label-sm text-secondary">D</div>
+<div class="text-center font-label-sm text-secondary">E</div>
+<!-- Row 1 -->
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">1</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-occupied shadow-sm">1</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">1</button></div>
+<div class="flex justify-center items-center font-label-sm text-secondary opacity-30">1</div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">1</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">1</button></div>
+<!-- Row 2 -->
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-occupied shadow-sm">2</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-occupied shadow-sm">2</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">2</button></div>
+<div class="flex justify-center items-center font-label-sm text-secondary opacity-30">2</div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">2</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">2</button></div>
+<!-- Row 3 -->
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">3</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-selected shadow-md font-bold">3</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">3</button></div>
+<div class="flex justify-center items-center font-label-sm text-secondary opacity-30">3</div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">3</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">3</button></div>
+<!-- Row 4 -->
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">4</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">4</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">4</button></div>
+<div class="flex justify-center items-center font-label-sm text-secondary opacity-30">4</div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-occupied shadow-sm">4</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-occupied shadow-sm">4</button></div>
+<!-- Row 5 -->
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">5</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">5</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">5</button></div>
+<div class="flex justify-center items-center font-label-sm text-secondary opacity-30">5</div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">5</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">5</button></div>
+<!-- Row 6 -->
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-occupied shadow-sm">6</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-occupied shadow-sm">6</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">6</button></div>
+<div class="flex justify-center items-center font-label-sm text-secondary opacity-30">6</div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">6</button></div>
+<div class="flex justify-center"><button class="w-10 h-10 rounded-lg seat-available shadow-sm hover:border-primary active:scale-90 transition-all">6</button></div>
+</div>
+<!-- Coach Window Visuals -->
+<div class="absolute top-20 left-1 w-1 h-64 bg-surface-container rounded-full opacity-50"></div>
+<div class="absolute top-20 right-1 w-1 h-64 bg-surface-container rounded-full opacity-50"></div>
+</div>
+</section>
+</main>
+<!-- Bottom Action Bar -->
+<footer class="fixed bottom-0 left-0 w-full z-50 bg-surface-container-lowest shadow-[0_-8px_16px_rgba(0,0,0,0.08)] px-margin-mobile py-4">
+<div class="max-w-[1200px] mx-auto flex items-center justify-between gap-4">
+<div class="flex flex-col">
+<span class="font-label-sm text-label-sm text-secondary">Kursi Dipilih</span>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-md text-headline-md text-primary font-bold">4-3B</span>
+<span class="font-label-sm text-label-sm text-secondary">Premium Economy</span>
+</div>
+</div>
+<button class="flex-1 max-w-[240px] bg-primary-container text-on-primary py-4 rounded-xl font-bold font-body-lg text-body-lg shadow-md active:scale-95 transition-transform">
+                Konfirmasi
+            </button>
+</div>
+</footer>
+<!-- Bottom Navigation Component (Implicitly excluded due to task focus, but structure placeholder if needed) -->
+<!-- Navigation is suppressed for task-focused seat selection screen as per 'Shared Components Logic' -->
+</body></html>

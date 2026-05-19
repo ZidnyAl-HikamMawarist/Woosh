@@ -2,10 +2,12 @@ package com.example.woosh.ui.screens
 
 import android.widget.Toast
 import androidx.compose.animation.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -17,55 +19,44 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.woosh.ui.components.*
+import com.example.woosh.R
 import com.example.woosh.ui.theme.*
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(
+    navController: NavHostController,
+    viewModel: HomeViewModel = hiltViewModel(),
+    notificationViewModel: NotificationViewModel = hiltViewModel()
+) {
     val context = LocalContext.current
-    val pagerState = rememberPagerState(pageCount = { 3 })
-    val sharedPrefs = remember { context.getSharedPreferences("woosh_prefs", android.content.Context.MODE_PRIVATE) }
-    
-    var origin by remember { mutableStateOf("Stasiun Gambir (JKT)") }
-    var destination by remember { mutableStateOf("Stasiun Halim (BDG)") }
-    var passengerCount by remember { mutableIntStateOf(1) }
-    var selectedDate by remember { mutableLongStateOf(System.currentTimeMillis()) }
-    var selectedTimeSlot by remember { mutableStateOf("Pagi (06:00 - 11:00)") }
-    
-    var recentSearches by remember { 
-        mutableStateOf(sharedPrefs.getStringSet("recent_searches", emptySet())?.toList()?.take(3) ?: emptyList()) 
-    }
-    
+    val uiState by viewModel.uiState.collectAsState()
+    val pagerState = rememberPagerState(pageCount = { 4 })
+
     val sheetState = rememberModalBottomSheetState()
     var showSheetType by remember { mutableStateOf<String?>(null) }
 
-    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = selectedDate)
-    val isRouteValid = origin != destination
-    
-    var loyaltyPoints by remember { mutableLongStateOf(0L) }
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    
-    LaunchedEffect(currentUser) {
-        if (currentUser != null) {
-            FirebaseFirestore.getInstance().collection("users")
-                .document(currentUser.uid)
-                .addSnapshotListener { snapshot, _ ->
-                    loyaltyPoints = snapshot?.getLong("loyaltyPoints") ?: 0L
-                }
-        }
-    }
+    val datePickerState = rememberDatePickerState(initialSelectedDateMillis = uiState.selectedDate)
+    val isRouteValid = uiState.origin != uiState.destination
 
+    // Bottom sheet dialogs
     if (showSheetType != null) {
         ModalBottomSheet(
             onDismissRequest = { showSheetType = null },
@@ -75,39 +66,98 @@ fun HomeScreen(navController: NavHostController) {
             Column(modifier = Modifier.padding(24.dp).fillMaxWidth().padding(bottom = 32.dp)) {
                 when (showSheetType) {
                     "origin" -> {
-                        Text("Pilih Stasiun Asal", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = ElegantDark)
+                        Text("Pilih Stasiun Asal", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                         Spacer(Modifier.height(16.dp))
-                        listOf("Stasiun Gambir (JKT)", "Stasiun Surabaya Gubeng (SBY)", "Stasiun Halim (BDG)").forEach {
-                            TextButton(onClick = { origin = it; showSheetType = null }, modifier = Modifier.fillMaxWidth()) {
-                                Text(it, color = if(origin == it) ElegantDark else TextPrimary, fontWeight = if(origin == it) FontWeight.Bold else FontWeight.Normal)
+                        WooshStations.all.forEach { station ->
+                            val isSelected = uiState.origin == station.name
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected) WooshRed.copy(0.05f) else SurfaceWhite
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                onClick = { viewModel.updateOrigin(station.name); showSheetType = null }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier.size(40.dp).background(
+                                            if (isSelected) WooshRed.copy(0.1f) else Color(0xFFF0F0F0),
+                                            CircleShape
+                                        ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(station.code, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                                            color = if (isSelected) WooshRed else TextSecondary)
+                                    }
+                                    Spacer(Modifier.width(16.dp))
+                                    Text(
+                                        station.name,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (isSelected) WooshRed else TextPrimary
+                                    )
+                                    if (isSelected) {
+                                        Spacer(Modifier.weight(1f))
+                                        Icon(Icons.Default.CheckCircle, null, tint = WooshRed, modifier = Modifier.size(20.dp))
+                                    }
+                                }
                             }
                         }
                     }
                     "dest" -> {
-                        Text("Pilih Stasiun Tujuan", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = ElegantDark)
+                        Text("Pilih Stasiun Tujuan", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                         Spacer(Modifier.height(16.dp))
-                        listOf("Stasiun Halim (BDG)", "Stasiun Yogyakarta (YK)", "Stasiun Padalarang (PDL)", "Stasiun Gambir (JKT)").forEach {
-                            TextButton(onClick = { destination = it; showSheetType = null }, modifier = Modifier.fillMaxWidth()) {
-                                Text(it, color = if(destination == it) ElegantDark else TextPrimary, fontWeight = if(destination == it) FontWeight.Bold else FontWeight.Normal)
-                            }
-                        }
-                    }
-                    "time" -> {
-                        Text("Waktu Keberangkatan", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = ElegantDark)
-                        Spacer(Modifier.height(16.dp))
-                        listOf("Pagi (06:00 - 11:00)", "Siang (11:00 - 15:00)", "Sore (15:00 - 19:00)", "Malam (19:00 - 23:00)").forEach {
-                            TextButton(onClick = { selectedTimeSlot = it; showSheetType = null }, modifier = Modifier.fillMaxWidth()) {
-                                Text(it, color = if(selectedTimeSlot == it) ElegantDark else TextPrimary)
+                        WooshStations.all.forEach { station ->
+                            val isSelected = uiState.destination == station.name
+                            Card(
+                                modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = if (isSelected) WooshRed.copy(0.05f) else SurfaceWhite
+                                ),
+                                shape = RoundedCornerShape(12.dp),
+                                onClick = { viewModel.updateDestination(station.name); showSheetType = null }
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier.size(40.dp).background(
+                                            if (isSelected) WooshRed.copy(0.1f) else Color(0xFFF0F0F0),
+                                            CircleShape
+                                        ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(station.code, fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                                            color = if (isSelected) WooshRed else TextSecondary)
+                                    }
+                                    Spacer(Modifier.width(16.dp))
+                                    Text(
+                                        station.name,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (isSelected) WooshRed else TextPrimary
+                                    )
+                                    if (isSelected) {
+                                        Spacer(Modifier.weight(1f))
+                                        Icon(Icons.Default.CheckCircle, null, tint = WooshRed, modifier = Modifier.size(20.dp))
+                                    }
+                                }
                             }
                         }
                     }
                     "date" -> {
-                        DatePicker(state = datePickerState, colors = DatePickerDefaults.colors(selectedDayContainerColor = ElegantDark, selectedDayContentColor = PrimaryGold))
+                        DatePicker(state = datePickerState, colors = DatePickerDefaults.colors(
+                            selectedDayContainerColor = WooshRed, 
+                            selectedDayContentColor = Color.White,
+                            todayContentColor = WooshRed
+                        ))
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                            TextButton(onClick = { 
-                                selectedDate = datePickerState.selectedDateMillis ?: selectedDate
-                                showSheetType = null 
-                            }) { Text("Selesai", color = ElegantDark, fontWeight = FontWeight.Bold) }
+                            TextButton(onClick = {
+                                viewModel.updateSelectedDate(datePickerState.selectedDateMillis ?: uiState.selectedDate)
+                                showSheetType = null
+                            }) { Text("Selesai", color = WooshRed, fontWeight = FontWeight.Bold) }
                         }
                     }
                 }
@@ -115,148 +165,345 @@ fun HomeScreen(navController: NavHostController) {
         }
     }
 
-    LazyColumn(modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp)) {
+    LazyColumn(modifier = Modifier.fillMaxSize().background(OffWhite)) {
+        // =====================================================
+        // HERO HEADER — Full-width carousel
+        // =====================================================
         item {
-            Spacer(modifier = Modifier.height(32.dp))
-            HeaderSection(navController)
-            Spacer(modifier = Modifier.height(24.dp))
-            FrequentWhoosherCard(points = loyaltyPoints) { navController.navigate("loyalty") }
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            // --- SEARCH FORM ---
+            Box(modifier = Modifier.fillMaxWidth()) {
+                // Background red gradient like official app
+                Box(modifier = Modifier.fillMaxWidth().height(160.dp).background(
+                    Brush.verticalGradient(listOf(WooshRed, WooshRedDark))
+                ))
+
+                // Image Carousel — full width, floating
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier
+                        .padding(top = 20.dp, bottom = 40.dp)
+                        .fillMaxWidth()
+                        .height(180.dp)
+                ) { page ->
+                    CarouselBanner(page)
+                }
+
+                // Pager dots overlay at bottom of carousel
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 50.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    repeat(pagerState.pageCount) { i ->
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 3.dp)
+                                .size(if (pagerState.currentPage == i) 8.dp else 6.dp)
+                                .clip(CircleShape)
+                                .background(if (pagerState.currentPage == i) Color.White else Color.White.copy(0.5f))
+                        )
+                    }
+                }
+            }
+        }
+
+        // =====================================================
+        // BOOKING FORM CARD — overlaps the red header
+        // =====================================================
+        item {
             Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .offset(y = (-40).dp),
                 colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                shape = RoundedCornerShape(28.dp)
+                shape = RoundedCornerShape(16.dp)
             ) {
-                Column(modifier = Modifier.padding(24.dp)) {
-                    Column(
+                Column(modifier = Modifier.padding(20.dp)) {
+                    // FROM / TO with Swap button
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // From column
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { showSheetType = "origin" }
+                                .padding(8.dp)
+                        ) {
+                            Text("Asal", fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium)
+                            Text(uiState.origin, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        }
+
+                        // Swap button (round, centered)
+                        IconButton(
+                            onClick = { viewModel.swapRoute() },
+                            modifier = Modifier
+                                .size(40.dp)
+                                .shadow(2.dp, CircleShape)
+                                .background(SurfaceWhite, CircleShape)
+                        ) {
+                            Icon(Icons.Default.SwapHoriz, contentDescription = "Swap", tint = WooshRed, modifier = Modifier.size(24.dp))
+                        }
+
+                        // To column
+                        Column(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { showSheetType = "dest" }
+                                .padding(8.dp),
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Text("Tujuan", fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium, textAlign = TextAlign.End, modifier = Modifier.fillMaxWidth())
+                            Text(uiState.destination, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TextPrimary, textAlign = TextAlign.End, modifier = Modifier.fillMaxWidth())
+                        }
+                    }
+
+                    if (!isRouteValid) {
+                        Text(
+                            "⚠ Stasiun asal dan tujuan tidak boleh sama",
+                            color = WooshRed,
+                            fontSize = 11.sp,
+                            modifier = Modifier.padding(top = 4.dp, start = 4.dp)
+                        )
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+                    HorizontalDivider(color = DividerColor)
+                    Spacer(Modifier.height(16.dp))
+
+                    // Departure date
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(OffWhite.copy(alpha = 0.5f))
-                            .padding(12.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable { showSheetType = "date" }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        SearchFieldClickable(label = "DARI", value = origin, icon = Icons.Default.TripOrigin) { showSheetType = "origin" }
-                        HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), color = Color.LightGray.copy(alpha = 0.3f))
-                        SearchFieldClickable(label = "KE", value = destination, icon = Icons.Default.LocationOn) { showSheetType = "dest" }
-                    }
-                    
-                    if (!isRouteValid) {
-                        Text("Stasiun asal dan tujuan tidak boleh sama", color = ElegantDark, fontSize = 11.sp, modifier = Modifier.padding(top = 8.dp, start = 4.dp))
+                        Icon(Icons.Default.CalendarToday, null, tint = WooshRed, modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(12.dp))
+                        Column {
+                            Text("Tanggal Keberangkatan", fontSize = 12.sp, color = TextSecondary, fontWeight = FontWeight.Medium)
+                            val formatter = SimpleDateFormat("EEE, dd MMM yyyy", Locale("id", "ID"))
+                            Text(formatter.format(Date(uiState.selectedDate)), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                        }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(Modifier.height(24.dp))
 
-                    Row(modifier = Modifier.fillMaxWidth()) {
-                        Box(modifier = Modifier.weight(1f)) {
-                            val formatter = SimpleDateFormat("dd MMM yyyy", Locale("id", "ID"))
-                            val dateString = formatter.format(Date(selectedDate))
-                            Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(OffWhite.copy(alpha = 0.5f)).clickable { showSheetType = "date" }.padding(12.dp)) {
-                                Text("TANGGAL", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = ElegantDark)
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.CalendarToday, null, modifier = Modifier.size(14.dp), tint = TextSecondary)
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(dateString, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                                }
-                            }
-                        }
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Box(modifier = Modifier.weight(1f)) {
-                            Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(OffWhite.copy(alpha = 0.5f)).clickable { showSheetType = "time" }.padding(12.dp)) {
-                                Text("WAKTU", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = ElegantDark)
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(Icons.Default.Schedule, null, modifier = Modifier.size(14.dp), tint = TextSecondary)
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(selectedTimeSlot.split(" ")[0], fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                                }
-                            }
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(OffWhite.copy(alpha = 0.5f)).padding(12.dp)) {
-                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Group, null, modifier = Modifier.size(18.dp), tint = ElegantDark)
-                                Spacer(Modifier.width(12.dp))
-                                Column {
-                                    Text("PENUMPANG", fontSize = 9.sp, fontWeight = FontWeight.Bold, color = ElegantDark)
-                                    Text("$passengerCount Penumpang", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                                }
-                            }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                IconButton(onClick = { if (passengerCount > 1) passengerCount-- }, modifier = Modifier.size(28.dp).background(SurfaceWhite, CircleShape)) { Icon(Icons.Default.Remove, null, modifier = Modifier.size(14.dp), tint = ElegantDark) }
-                                Spacer(Modifier.width(12.dp))
-                                IconButton(onClick = { if (passengerCount < 10) passengerCount++ }, modifier = Modifier.size(28.dp).background(SurfaceWhite, CircleShape)) { Icon(Icons.Default.Add, null, modifier = Modifier.size(14.dp), tint = ElegantDark) }
-                            }
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
+                    // SEARCH BUTTON — red like the real app
                     Button(
-                        onClick = { 
+                        onClick = {
                             if (isRouteValid) {
-                                val searchStr = "$origin → $destination"
-                                val currentSet = sharedPrefs.getStringSet("recent_searches", emptySet()) ?: emptySet()
-                                val newSet = (setOf(searchStr) + currentSet).take(3).toSet()
-                                sharedPrefs.edit().putStringSet("recent_searches", newSet).apply()
-                                recentSearches = newSet.toList()
-                                
-                                navController.navigate("train_list/$destination/$passengerCount") 
+                                viewModel.addRecentSearch(uiState.origin, uiState.destination)
+                                navController.navigate("train_list/${android.net.Uri.encode(uiState.destination)}/${uiState.passengerCount}/${uiState.selectedDate}")
                             } else {
                                 Toast.makeText(context, "Silakan pilih rute yang valid", Toast.LENGTH_SHORT).show()
                             }
-                        }, 
-                        modifier = Modifier.fillMaxWidth().height(56.dp), 
-                        colors = ButtonDefaults.buttonColors(containerColor = if(isRouteValid) ElegantDark else Color.Gray, contentColor = PrimaryGold), 
-                        shape = RoundedCornerShape(16.dp), 
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp),
-                        enabled = isRouteValid
-                    ) { 
-                        Text("Cari Kereta Sekarang", fontWeight = FontWeight.Bold, fontSize = 16.sp) 
-                    }
-                }
-            }
-            
-            if (recentSearches.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(32.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text("Pencarian Terakhir", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-                    TextButton(onClick = { 
-                        sharedPrefs.edit().remove("recent_searches").apply()
-                        recentSearches = emptyList()
-                    }) { Text("Hapus", color = ElegantDark, fontSize = 12.sp) }
-                }
-                recentSearches.forEach { search ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
-                        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-                        shape = RoundedCornerShape(16.dp),
-                        onClick = {
-                            val parts = search.split(" → ")
-                            if (parts.size == 2) { origin = parts[0]; destination = parts[1] }
-                        }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = WooshRed),
+                        shape = RoundedCornerShape(27.dp),
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                     ) {
-                        Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.History, null, modifier = Modifier.size(18.dp), tint = Color.Gray)
-                            Spacer(Modifier.width(16.dp))
-                            Text(search, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = TextPrimary)
-                        }
+                        Text("Cari Jadwal", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
                     }
                 }
             }
+        }
 
-            Spacer(modifier = Modifier.height(32.dp))
-            SectionTitle("Promo Spesial")
-            HorizontalPager(state = pagerState, modifier = Modifier.fillMaxWidth().height(160.dp).clip(RoundedCornerShape(24.dp))) { page -> OfferBanner() }
-            Spacer(modifier = Modifier.height(12.dp))
-            Row(Modifier.fillMaxWidth().height(12.dp), horizontalArrangement = Arrangement.Center) {
-                repeat(pagerState.pageCount) { iteration ->
-                    val color = if (pagerState.currentPage == iteration) ElegantDark else Color.LightGray
-                    Box(modifier = Modifier.padding(2.dp).clip(CircleShape).background(color).size(6.dp))
+        // =====================================================
+        // MARQUEE / NOTICE BANNER
+        // =====================================================
+        item {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .offset(y = (-10).dp),
+                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Campaign, null, tint = WooshRed, modifier = Modifier.size(20.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        "Please check your travel schedule again. The process...",
+                        fontSize = 12.sp,
+                        color = TextSecondary,
+                        maxLines = 1
+                    )
                 }
             }
-            Spacer(modifier = Modifier.height(32.dp))
         }
+
+        // =====================================================
+        // RAILWAY REGULATIONS SECTION
+        // =====================================================
+        item {
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Railway regulations", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                TextButton(onClick = { navController.navigate("information") }) {
+                    Text("More", color = WooshRed, fontSize = 13.sp)
+                }
+            }
+            Spacer(Modifier.height(8.dp))
+        }
+
+        // Regulation cards
+        items(getRegulationItems()) { item ->
+            RegulationCard(
+                iconRes = item.iconRes,
+                title = item.title,
+                subtitle = item.subtitle,
+                onClick = { navController.navigate("information") }
+            )
+        }
+
+        // =====================================================
+        // RECENT SEARCHES
+        // =====================================================
+        if (uiState.recentSearches.isNotEmpty()) {
+            item {
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Pencarian Terakhir", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
+                    TextButton(onClick = { viewModel.clearRecentSearches() }) {
+                        Text("Hapus", color = WooshRed, fontSize = 12.sp)
+                    }
+                }
+            }
+            items(uiState.recentSearches) { search ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 4.dp),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+                    shape = RoundedCornerShape(12.dp),
+                    onClick = {
+                        val parts = search.split(" → ")
+                        if (parts.size == 2) {
+                            viewModel.updateOrigin(parts[0])
+                            viewModel.updateDestination(parts[1])
+                        }
+                    }
+                ) {
+                    Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Default.History, null, modifier = Modifier.size(18.dp), tint = WooshRed)
+                        Spacer(Modifier.width(12.dp))
+                        Text(search, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = TextPrimary)
+                    }
+                }
+            }
+        }
+
+        // Bottom spacer
+        item { Spacer(Modifier.height(32.dp)) }
     }
 }
 
+// =====================================================
+// CAROUSEL BANNER — mimics real Whoosh carousel
+// =====================================================
+@Composable
+fun CarouselBanner(page: Int) {
+    val banners = listOf(
+        R.drawable.banner_1,
+        R.drawable.banner_2,
+        R.drawable.banner_3,
+        R.drawable.banner_4
+    )
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .shadow(4.dp, RoundedCornerShape(12.dp)),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Image(
+            painter = painterResource(id = banners[page % banners.size]),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+    }
+}
+
+// =====================================================
+// REGULATION CARDS
+// =====================================================
+data class RegulationItem(
+    val iconRes: Int? = null,
+    val title: String,
+    val subtitle: String
+)
+
+fun getRegulationItems(): List<RegulationItem> {
+    return listOf(
+        RegulationItem(title = "Whoosh and Feeder Train Schedule", subtitle = "Whoosh High Speed Railway schedule and integration with Feeder Trains"),
+        RegulationItem(title = "Refund / Reschedule", subtitle = "Refund / Reschedule"),
+        RegulationItem(title = "Passenger Guidelines", subtitle = "Terms and conditions for passengers"),
+        RegulationItem(title = "Baggage Policy", subtitle = "Rules about luggage and prohibited items")
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun RegulationCard(
+    iconRes: Int? = null,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit = {}
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 4.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
+        shape = RoundedCornerShape(14.dp),
+        elevation = CardDefaults.cardElevation(2.dp),
+        onClick = onClick
+    ) {
+        Row(
+            modifier = Modifier.padding(14.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Icon placeholder (like the real app's square thumbnails)
+            Box(
+                modifier = Modifier
+                    .size(56.dp)
+                    .background(WooshRed.copy(0.08f), RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(Icons.Default.Train, null, tint = WooshRed, modifier = Modifier.size(28.dp))
+            }
+            Spacer(Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(title, fontWeight = FontWeight.Bold, fontSize = 14.sp, lineHeight = 18.sp, color = TextPrimary)
+                Spacer(Modifier.height(2.dp))
+                Text(subtitle, fontSize = 12.sp, color = TextSecondary, lineHeight = 16.sp, maxLines = 2)
+            }
+        }
+    }
+}

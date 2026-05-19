@@ -30,10 +30,10 @@ object EmailService {
     }
 
     // Ganti dengan kredensial EmailJS Anda
-    private const val SERVICE_ID = "service_be8w9pg" 
-    private const val TEMPLATE_ID = "template_wskgile"
-    private const val PUBLIC_KEY = "sl02ENYxdy2uVu8DT" 
-    private const val PRIVATE_KEY = "ywx51NdNfRr6aJf7Ov_Jk"
+    private val SERVICE_ID = com.example.woosh.BuildConfig.EMAILJS_SERVICE_ID 
+    private val TEMPLATE_ID = com.example.woosh.BuildConfig.EMAILJS_TEMPLATE_ID
+    private val PUBLIC_KEY = com.example.woosh.BuildConfig.EMAILJS_PUBLIC_KEY 
+    private val PRIVATE_KEY = com.example.woosh.BuildConfig.EMAILJS_PRIVATE_KEY
 
     suspend fun sendTicketEmail(
         toEmail: String, 

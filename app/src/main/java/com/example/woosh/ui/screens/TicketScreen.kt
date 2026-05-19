@@ -26,54 +26,31 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.woosh.model.Ticket
 import com.example.woosh.ui.components.CityInfo
 import com.example.woosh.ui.components.TicketInfo
 import com.example.woosh.ui.theme.*
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TicketScreen(navController: NavHostController, selectedSeats: String = "4C") {
+fun TicketScreen(navController: NavHostController, selectedSeats: String = "", viewModel: TicketViewModel = hiltViewModel()) {
     var selectedTab by remember { mutableIntStateOf(0) }
     val tabs = listOf("Aktif", "Riwayat")
     val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    val tickets = remember { mutableStateListOf<Ticket>() }
-    var isLoading by remember { mutableStateOf(true) }
+    val tickets by viewModel.tickets.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val scope = rememberCoroutineScope()
 
-    // REAL-TIME FETCH TICKETS FROM FIRESTORE
-    DisposableEffect(currentUser) {
-        if (currentUser != null) {
-            val listenerRegistration = FirebaseFirestore.getInstance().collection("users")
-                .document(currentUser.uid).collection("tickets")
-                .addSnapshotListener { snapshot, error ->
-                    if (error != null) {
-                        isLoading = false
-                        return@addSnapshotListener
-                    }
-                    
-                    if (snapshot != null) {
-                        tickets.clear()
-                        snapshot.documents.forEach { doc ->
-                            doc.toObject(Ticket::class.java)?.let { tickets.add(it) }
-                        }
-                    }
-                    isLoading = false
-                }
-            
-            onDispose {
-                listenerRegistration.remove()
-            }
-        } else {
-            isLoading = false
-            onDispose {}
+    var showRefundDialog by remember { mutableStateOf<Ticket?>(null) }
+
+    LaunchedEffect(selectedSeats) {
+        if (selectedSeats.isNotBlank()) {
+            snackbarHostState.showSnackbar("Reschedule berhasil! Kursi baru Anda: $selectedSeats")
         }
     }
 
@@ -81,7 +58,7 @@ fun TicketScreen(navController: NavHostController, selectedSeats: String = "4C")
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = { 
             CenterAlignedTopAppBar(
-                title = { Text("Tiket Digital", fontWeight = FontWeight.Bold) },
+                title = { Text("Tiket Digital", fontWeight = FontWeight.Bold, color = TextPrimary) },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = OffWhite)
             ) 
         },
@@ -91,11 +68,11 @@ fun TicketScreen(navController: NavHostController, selectedSeats: String = "4C")
             TabRow(
                 selectedTabIndex = selectedTab,
                 containerColor = SurfaceWhite,
-                contentColor = ElegantDark,
+                contentColor = WooshRed,
                 indicator = { tabPositions ->
                     TabRowDefaults.SecondaryIndicator(
                         Modifier.tabIndicatorOffset(tabPositions[selectedTab]),
-                        color = ElegantDark
+                        color = WooshRed
                     )
                 }
             ) {
@@ -103,14 +80,14 @@ fun TicketScreen(navController: NavHostController, selectedSeats: String = "4C")
                     Tab(
                         selected = selectedTab == index,
                         onClick = { selectedTab = index },
-                        text = { Text(title, fontWeight = if(selectedTab == index) FontWeight.Bold else FontWeight.Normal) }
+                        text = { Text(title, color = if(selectedTab == index) WooshRed else TextSecondary, fontWeight = if(selectedTab == index) FontWeight.Bold else FontWeight.Normal) }
                     )
                 }
             }
 
             if (isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(color = ElegantDark)
+                    CircularProgressIndicator(color = WooshRed)
                 }
             } else {
                 if (selectedTab == 0) {
@@ -123,12 +100,18 @@ fun TicketScreen(navController: NavHostController, selectedSeats: String = "4C")
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             items(activeTickets.size) { index ->
-                                TicketCard(activeTickets[index])
+                                TicketCard(
+                                    ticket = activeTickets[index],
+                                    onRefundClick = { showRefundDialog = it },
+                                    onRescheduleClick = { ticket -> 
+                                        navController.navigate("train_list/Halim/1?rescheduleId=${ticket.id}")
+                                    }
+                                )
                             }
                         }
                     }
                 } else {
-                    val historyTickets = tickets.filter { it.status == "Selesai" }
+                    val historyTickets = tickets.filter { it.status != "Aktif" }
                     if (historyTickets.isEmpty()) {
                         EmptyState("Belum ada riwayat tiket")
                     } else {
@@ -144,11 +127,48 @@ fun TicketScreen(navController: NavHostController, selectedSeats: String = "4C")
                 }
             }
         }
+
+        if (showRefundDialog != null) {
+            AlertDialog(
+                onDismissRequest = { showRefundDialog = null },
+                title = { Text("Konfirmasi Refund", color = TextPrimary) },
+                text = { Text("Apakah Anda yakin ingin membatalkan tiket ${showRefundDialog?.id}? Sesuai ketentuan, pengembalian dana akan diproses dalam 1-3 hari kerja.", color = TextSecondary) },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showRefundDialog?.let { ticket ->
+                                viewModel.refundTicket(ticket.id) { success ->
+                                    if (success) {
+                                        scope.launch {
+                                            snackbarHostState.showSnackbar("Tiket berhasil direfund")
+                                        }
+                                    }
+                                }
+                            }
+                            showRefundDialog = null
+                        }
+                    ) {
+                        Text("Ya, Batalkan", color = Color.Red)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showRefundDialog = null }) {
+                        Text("Kembali", color = WooshRed)
+                    }
+                },
+                containerColor = SurfaceWhite,
+                shape = RoundedCornerShape(20.dp)
+            )
+        }
     }
 }
 
 @Composable
-fun TicketCard(ticket: Ticket) {
+fun TicketCard(
+    ticket: Ticket, 
+    onRefundClick: ((Ticket) -> Unit)? = null,
+    onRescheduleClick: ((Ticket) -> Unit)? = null
+) {
     var isExpanded by remember { mutableStateOf(false) }
 
     Surface(
@@ -162,11 +182,17 @@ fun TicketCard(ticket: Ticket) {
             Column(modifier = Modifier.padding(20.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Column {
-                        Text("NOMOR TIKET", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = ElegantDark)
-                        Text(ticket.id, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                        Text("NOMOR TIKET", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
+                        Text(ticket.id, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                     }
-                    Surface(color = ElegantDark.copy(0.1f), shape = RoundedCornerShape(8.dp)) {
-                        Text(ticket.status.uppercase(), modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), fontSize = 10.sp, fontWeight = FontWeight.Bold, color = ElegantDark)
+                    val statusColor = when(ticket.status) {
+                        "Aktif" -> Color(0xFF4CAF50)
+                        "Refunded" -> Color(0xFFF44336)
+                        "Rescheduled" -> Color(0xFF2196F3)
+                        else -> TextSecondary
+                    }
+                    Surface(color = statusColor.copy(0.1f), shape = RoundedCornerShape(8.dp)) {
+                        Text(ticket.status.uppercase(), modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), fontSize = 10.sp, fontWeight = FontWeight.Bold, color = statusColor)
                     }
                 }
                 
@@ -175,14 +201,14 @@ fun TicketCard(ticket: Ticket) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                     CityInfo("JKT", "Halim", Alignment.Start)
                     Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                        Icon(Icons.Default.Train, null, modifier = Modifier.size(20.dp), tint = ElegantDark)
+                        Icon(Icons.Default.Train, null, modifier = Modifier.size(20.dp), tint = WooshRed)
                     }
                     CityInfo("BDG", "Padalarang", Alignment.End)
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Jadwal: ${ticket.date}", fontSize = 12.sp, color = Color.Gray)
+                    Text("Jadwal: ${ticket.date}", fontSize = 12.sp, color = TextSecondary)
                     Text("Kursi: ${ticket.seats}", fontWeight = FontWeight.Bold, color = TextPrimary)
                 }
             }
@@ -193,7 +219,7 @@ fun TicketCard(ticket: Ticket) {
                     Box(modifier = Modifier.size(16.dp, 32.dp).offset(x = (-8).dp).background(OffWhite, CircleShape))
                     Canvas(modifier = Modifier.weight(1f).height(1.dp)) {
                         drawLine(
-                            color = Color.LightGray,
+                            color = DividerColor,
                             start = Offset(0f, 0f),
                             end = Offset(size.width, 0f),
                             pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f), 0f)
@@ -211,7 +237,29 @@ fun TicketCard(ticket: Ticket) {
                         Icon(Icons.Default.QrCode2, null, modifier = Modifier.fillMaxSize(), tint = TextPrimary)
                     }
                     Spacer(Modifier.height(8.dp))
-                    Text("Scan saat masuk peron", fontSize = 10.sp, color = Color.Gray)
+                    Text("Scan saat masuk peron", fontSize = 10.sp, color = TextSecondary)
+                    
+                    if (ticket.status == "Aktif" && onRefundClick != null && onRescheduleClick != null) {
+                        Spacer(Modifier.height(20.dp))
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            OutlinedButton(
+                                onClick = { onRescheduleClick(ticket) },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                                border = BorderStroke(1.dp, WooshRed)
+                            ) {
+                                Text("Reschedule", color = WooshRed, fontSize = 12.sp)
+                            }
+                            Button(
+                                onClick = { onRefundClick(ticket) },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(12.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = WooshRed)
+                            ) {
+                                Text("Refund", color = Color.White, fontSize = 12.sp)
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -225,9 +273,9 @@ fun EmptyState(message: String) {
         verticalArrangement = Arrangement.Center, 
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(Icons.Default.History, null, modifier = Modifier.size(64.dp), tint = Color.LightGray)
+        Icon(Icons.Default.History, null, modifier = Modifier.size(64.dp), tint = WooshRed.copy(alpha = 0.4f))
         Spacer(Modifier.height(16.dp))
-        Text(message, color = Color.Gray, fontWeight = FontWeight.Medium)
+        Text(message, color = TextSecondary, fontWeight = FontWeight.Medium)
     }
 }
 

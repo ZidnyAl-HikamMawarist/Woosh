@@ -1,5 +1,6 @@
 package com.example.woosh.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -17,37 +18,36 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.example.woosh.data.EmailService
-import com.example.woosh.model.Ticket
-import com.example.woosh.ui.theme.ElegantDark
+
 import com.example.woosh.ui.theme.PrimaryGold
 import com.example.woosh.ui.theme.OffWhite
 import com.example.woosh.ui.theme.SurfaceWhite
 import com.example.woosh.ui.theme.TextPrimary
 import com.example.woosh.ui.theme.TextSecondary
+import com.example.woosh.ui.theme.WooshRed
 import java.text.NumberFormat
 import java.util.*
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.launch
-import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FieldValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PaymentScreen(navController: NavHostController, totalAmount: String, seats: String = "", trainId: String = "WOOSH502", trainName: String = "WOOSH 502") {
+fun PaymentScreen(
+    navController: NavHostController, 
+    totalAmount: String, 
+    seats: String = "", 
+    trainId: String = "WOOSH502", 
+    trainName: String = "WOOSH 502",
+    viewModel: PaymentViewModel = hiltViewModel()
+) {
     var selectedMethod by remember { mutableStateOf("QRIS") }
-    val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
-    var isProcessing by remember { mutableStateOf(false) }
-    var showErrorDialog by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf("") }
-    var dialogTitle by remember { mutableStateOf("") }
     
     // Format Display
     val rawAmount = totalAmount.toLongOrNull() ?: 0L
@@ -60,13 +60,27 @@ fun PaymentScreen(navController: NavHostController, totalAmount: String, seats: 
         PaymentMethod("Kartu Kredit/Debit", Icons.Default.CreditCard, "Visa, Mastercard")
     )
 
+    LaunchedEffect(uiState.paymentStatus) {
+        when (val status = uiState.paymentStatus) {
+            is PaymentStatus.Success -> {
+                Toast.makeText(context, "Berhasil! Tiket dikirim ke ${uiState.userEmail}", Toast.LENGTH_LONG).show()
+                navController.navigate("ticket/$seats") {
+                    popUpTo("home") { inclusive = false }
+                }
+                viewModel.resetStatus()
+            }
+            is PaymentStatus.Idle -> { }
+            else -> { }
+        }
+    }
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text("Metode Pembayaran", fontWeight = FontWeight.Bold) },
+                title = { Text("Metode Pembayaran", fontWeight = FontWeight.Bold, color = TextPrimary) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = ElegantDark)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = TextPrimary)
                     }
                 }
             )
@@ -74,13 +88,13 @@ fun PaymentScreen(navController: NavHostController, totalAmount: String, seats: 
     ) { padding ->
         Column(modifier = Modifier.padding(padding).fillMaxSize().padding(24.dp)) {
             // Price Details
-            Column(modifier = Modifier.fillMaxWidth().background(ElegantDark.copy(0.05f), RoundedCornerShape(16.dp)).padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(modifier = Modifier.fillMaxWidth().background(WooshRed.copy(0.05f), RoundedCornerShape(16.dp)).padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text("Total Pembayaran", color = TextSecondary, fontSize = 14.sp)
-                Text(displayAmount, fontWeight = FontWeight.Black, fontSize = 28.sp, color = ElegantDark)
+                Text(displayAmount, fontWeight = FontWeight.Black, fontSize = 28.sp, color = WooshRed)
             }
 
             Spacer(Modifier.height(32.dp))
-            Text("Pilih Metode Pembayaran", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text("Pilih Metode Pembayaran", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = TextPrimary)
             Spacer(Modifier.height(16.dp))
 
             methods.forEach { method ->
@@ -96,90 +110,21 @@ fun PaymentScreen(navController: NavHostController, totalAmount: String, seats: 
 
             Button(
                 onClick = { 
-                    isProcessing = true
-                    scope.launch {
-                        val userEmail = FirebaseAuth.getInstance().currentUser?.email ?: "user@example.com"
-                        val userName = FirebaseAuth.getInstance().currentUser?.displayName ?: "Penumpang Woosh"
-                        val ticketId = "WSH-TK-${System.currentTimeMillis().toString().takeLast(6)}"
-                        val currentDate = "12 Okt 2026" // Fixed for demo, or use actual current date
-                        
-                        val (isEmailSent, emailError) = EmailService.sendTicketEmail(
-                            toEmail = userEmail,
-                            name = userName,
-                            seats = seats,
-                            train = trainName,
-                            ticketId = ticketId,
-                            date = currentDate,
-                            totalPrice = displayAmount,
-                            paymentMethod = selectedMethod
-                        )
-                        
-                        isProcessing = false
-                        
-                        // Always try to save to Firestore regardless of email status
-                        val uid = FirebaseAuth.getInstance().currentUser?.uid
-                        if (uid != null) {
-                            val db = FirebaseFirestore.getInstance()
-                            val points = rawAmount / 10000 
-                            
-                            // 1. Update Points
-                            db.collection("users").document(uid)
-                                .update("loyaltyPoints", FieldValue.increment(points))
-                                .addOnFailureListener { e ->
-                                    dialogTitle = "Firestore Error (Poin)"
-                                    errorMessage = "Gagal update poin: ${e.message}\n\nPastikan Firebase Rules sudah 'allow read, write'."
-                                    showErrorDialog = true
-                                }
-                            
-                            // 2. Save Ticket (Use same ticketId)
-                            val newTicket = Ticket(
-                                id = ticketId,
-                                trainName = trainName,
-                                seats = seats,
-                                date = currentDate,
-                                totalPrice = displayAmount,
-                                status = "Aktif"
-                            )
-                            
-                            db.collection("users").document(uid).collection("tickets").add(newTicket)
-                                .addOnSuccessListener {
-                                    // 3. Register booked seats globally
-                                    val seatsList = seats.split(",")
-                                    db.collection("trips").document(trainId)
-                                        .set(
-                                            mapOf("bookedSeats" to FieldValue.arrayUnion(*seatsList.toTypedArray())),
-                                            com.google.firebase.firestore.SetOptions.merge()
-                                        )
-                                    
-                                    if (isEmailSent) {
-                                        Toast.makeText(context, "Berhasil! Tiket dikirim ke $userEmail", Toast.LENGTH_LONG).show()
-                                        navController.navigate("ticket/$seats") {
-                                            popUpTo("home") { inclusive = false }
-                                        }
-                                    } else {
-                                        dialogTitle = "Email Gagal Dikirim"
-                                        errorMessage = "Tiket Anda sudah tersimpan di sistem, namun pengiriman email gagal:\n\n$emailError\n\nSilakan cek tab 'Tiket' di aplikasi."
-                                        showErrorDialog = true
-                                    }
-                                }
-                                .addOnFailureListener { e ->
-                                    dialogTitle = "Firestore Error (Tiket)"
-                                    errorMessage = "Gagal menyimpan tiket: ${e.message}\n\nDomain: ${e.localizedMessage}\n\nSaran: Cek Firebase Rules di Console."
-                                    showErrorDialog = true
-                                }
-                        } else {
-                            dialogTitle = "Auth Error"
-                            errorMessage = "Sesi Anda telah berakhir. Silakan login kembali."
-                            showErrorDialog = true
-                        }
-                    }
+                    viewModel.processPayment(
+                        seats = seats,
+                        trainId = trainId,
+                        trainName = trainName,
+                        displayAmount = displayAmount,
+                        rawAmount = rawAmount,
+                        selectedMethod = selectedMethod
+                    )
                 },
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                enabled = !isProcessing,
-                colors = ButtonDefaults.buttonColors(containerColor = ElegantDark, contentColor = PrimaryGold),
+                enabled = !uiState.isProcessing,
+                colors = ButtonDefaults.buttonColors(containerColor = WooshRed, contentColor = Color.White),
                 shape = RoundedCornerShape(16.dp)
             ) {
-                if (isProcessing) {
+                if (uiState.isProcessing) {
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
                 } else {
                     Text("Bayar Sekarang", fontWeight = FontWeight.Bold, fontSize = 16.sp)
@@ -188,26 +133,41 @@ fun PaymentScreen(navController: NavHostController, totalAmount: String, seats: 
         }
     }
 
-    if (showErrorDialog) {
-        AlertDialog(
-            onDismissRequest = { showErrorDialog = false },
-            title = { Text(dialogTitle, fontWeight = FontWeight.Bold, color = ElegantDark) },
-            text = { Text(errorMessage) },
-            confirmButton = {
-                TextButton(onClick = { 
-                    showErrorDialog = false 
-                    if (dialogTitle == "Email Gagal Dikirim") {
+    when (val status = uiState.paymentStatus) {
+        is PaymentStatus.Error -> {
+            AlertDialog(
+                onDismissRequest = { viewModel.resetStatus() },
+                title = { Text(status.title, fontWeight = FontWeight.Bold, color = TextPrimary) },
+                text = { Text(status.message, color = TextSecondary) },
+                confirmButton = {
+                    TextButton(onClick = { viewModel.resetStatus() }) {
+                        Text("OK", color = WooshRed, fontWeight = FontWeight.Bold)
+                    }
+                },
+                containerColor = SurfaceWhite,
+                shape = RoundedCornerShape(24.dp)
+            )
+        }
+        is PaymentStatus.FailedEmail -> {
+            AlertDialog(
+                onDismissRequest = { viewModel.resetStatus() },
+                title = { Text("Email Gagal Dikirim", fontWeight = FontWeight.Bold, color = TextPrimary) },
+                text = { Text(status.message, color = TextSecondary) },
+                confirmButton = {
+                    TextButton(onClick = { 
+                        viewModel.resetStatus()
                         navController.navigate("ticket/$seats") {
                             popUpTo("home") { inclusive = false }
                         }
+                    }) {
+                        Text("OK", color = WooshRed, fontWeight = FontWeight.Bold)
                     }
-                }) {
-                    Text("OK", color = ElegantDark, fontWeight = FontWeight.Bold)
-                }
-            },
-            containerColor = SurfaceWhite,
-            shape = RoundedCornerShape(24.dp)
-        )
+                },
+                containerColor = SurfaceWhite,
+                shape = RoundedCornerShape(24.dp)
+            )
+        }
+        else -> { }
     }
 }
 
@@ -219,21 +179,21 @@ fun PaymentMethodItem(method: PaymentMethod, selected: Boolean, onClick: () -> U
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = if (selected) ElegantDark.copy(0.05f) else SurfaceWhite
+            containerColor = if (selected) WooshRed.copy(0.05f) else SurfaceWhite
         ),
-        border = if (selected) androidx.compose.foundation.BorderStroke(2.dp, ElegantDark) else null,
+        border = if (selected) androidx.compose.foundation.BorderStroke(2.dp, WooshRed) else null,
         shape = RoundedCornerShape(16.dp)
     ) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Box(modifier = Modifier.size(40.dp).background(if(selected) ElegantDark else OffWhite, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
-                Icon(method.icon, null, tint = if(selected) Color.White else ElegantDark, modifier = Modifier.size(24.dp))
+            Box(modifier = Modifier.size(40.dp).background(if(selected) WooshRed else OffWhite, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
+                Icon(method.icon, null, tint = if(selected) Color.White else WooshRed, modifier = Modifier.size(24.dp))
             }
             Spacer(Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(method.name, fontWeight = FontWeight.Bold, fontSize = 16.sp, color = TextPrimary)
                 Text(method.subtitle, fontSize = 12.sp, color = TextSecondary)
             }
-            RadioButton(selected = selected, onClick = onClick, colors = RadioButtonDefaults.colors(selectedColor = ElegantDark))
+            RadioButton(selected = selected, onClick = onClick, colors = RadioButtonDefaults.colors(selectedColor = WooshRed))
         }
     }
 }
