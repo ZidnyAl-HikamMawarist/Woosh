@@ -111,7 +111,12 @@ class CheckoutViewModel @Inject constructor(
         newDate: Long,
         onComplete: (Boolean) -> Unit
     ) {
-        val uid = auth.currentUser?.uid ?: return
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            _uiState.update { it.copy(isLoading = false, errorMessage = "User not logged in") }
+            onComplete(false)
+            return
+        }
         
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }

@@ -3,7 +3,7 @@ package com.example.woosh.utils
 import android.content.Context
 
 class SecurityManager(context: Context) {
-    private val prefs = context.getSharedPreferences("woosh_security_prefs", Context.MODE_PRIVATE)
+    private val prefs = context.applicationContext.getSharedPreferences("woosh_security_prefs", Context.MODE_PRIVATE)
 
     fun setBiometricEnabled(enabled: Boolean) {
         prefs.edit().putBoolean("biometric_enabled", enabled).apply()

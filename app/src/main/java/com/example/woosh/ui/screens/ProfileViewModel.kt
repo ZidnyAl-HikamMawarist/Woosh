@@ -82,18 +82,38 @@ class ProfileViewModel @Inject constructor(
         val user = auth.currentUser
         val uid = user?.uid
         if (user != null && uid != null) {
-            // Delete user data from Firestore first
-            firestore.collection("users").document(uid)
-                .delete()
-                .addOnSuccessListener {
+            val userDocRef = firestore.collection("users").document(uid)
+            userDocRef.get().addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val backupData = document.data
+                    userDocRef.delete()
+                        .addOnSuccessListener {
+                            user.delete()
+                                .addOnCompleteListener { task ->
+                                    if (task.isSuccessful) {
+                                        onComplete(true)
+                                    } else {
+                                        // Restore Firestore data if auth deletion fails
+                                        if (backupData != null) {
+                                            userDocRef.set(backupData)
+                                        }
+                                        onComplete(false)
+                                    }
+                                }
+                        }
+                        .addOnFailureListener {
+                            onComplete(false)
+                        }
+                } else {
+                    // No data in Firestore, try to delete Auth user directly
                     user.delete()
                         .addOnCompleteListener { task ->
                             onComplete(task.isSuccessful)
                         }
                 }
-                .addOnFailureListener {
-                    onComplete(false)
-                }
+            }.addOnFailureListener {
+                onComplete(false)
+            }
         } else {
             onComplete(false)
         }

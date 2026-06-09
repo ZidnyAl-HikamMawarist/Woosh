@@ -34,6 +34,9 @@ import com.example.woosh.ui.components.TicketInfo
 import com.example.woosh.ui.theme.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -90,8 +93,31 @@ fun TicketScreen(navController: NavHostController, selectedSeats: String = "", v
                     CircularProgressIndicator(color = WooshRed)
                 }
             } else {
+                // Tiket "Aktif" yang tanggal keberangkatannya sudah lewat dianggap selesai
+                val now = Calendar.getInstance()
+                now.set(Calendar.HOUR_OF_DAY, 0)
+                now.set(Calendar.MINUTE, 0)
+                now.set(Calendar.SECOND, 0)
+                now.set(Calendar.MILLISECOND, 0)
+                val today = now.timeInMillis
+
+                val dateParser = SimpleDateFormat("dd MMM yyyy", Locale.forLanguageTag("id-ID"))
+
+                fun isTicketExpired(ticket: Ticket): Boolean {
+                    if (ticket.status != "Aktif") return false
+                    return try {
+                        val ticketDate = dateParser.parse(ticket.date)
+                        ticketDate != null && ticketDate.time < today
+                    } catch (e: Exception) { false }
+                }
+
                 if (selectedTab == 0) {
-                    val activeTickets = tickets.filter { it.status == "Aktif" }
+                    val activeTickets = tickets.filter { it.status == "Aktif" && !isTicketExpired(it) }
+                        .sortedBy { 
+                            try {
+                                dateParser.parse(it.date)?.time ?: Long.MAX_VALUE
+                            } catch (e: Exception) { Long.MAX_VALUE }
+                        }
                     if (activeTickets.isEmpty()) {
                         EmptyState("Belum ada tiket aktif")
                     } else {
@@ -103,15 +129,22 @@ fun TicketScreen(navController: NavHostController, selectedSeats: String = "", v
                                 TicketCard(
                                     ticket = activeTickets[index],
                                     onRefundClick = { showRefundDialog = it },
-                                    onRescheduleClick = { ticket -> 
-                                        navController.navigate("train_list/Halim/1?rescheduleId=${ticket.id}")
+                                    onRescheduleClick = { ticket ->
+                                        // Sertakan date (timestamp hari ini) agar route lengkap dan tidak crash
+                                        navController.navigate("train_list/Halim/1/${System.currentTimeMillis()}?rescheduleId=${ticket.id}")
                                     }
                                 )
                             }
                         }
                     }
                 } else {
-                    val historyTickets = tickets.filter { it.status != "Aktif" }
+                    // Riwayat: tiket berstatus bukan Aktif, ATAU tiket Aktif yang tanggalnya sudah lewat
+                    val historyTickets = tickets.filter { it.status != "Aktif" || isTicketExpired(it) }
+                        .sortedByDescending { 
+                            try {
+                                dateParser.parse(it.date)?.time ?: 0L
+                            } catch (e: Exception) { 0L }
+                        }
                     if (historyTickets.isEmpty()) {
                         EmptyState("Belum ada riwayat tiket")
                     } else {
@@ -120,7 +153,10 @@ fun TicketScreen(navController: NavHostController, selectedSeats: String = "", v
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             items(historyTickets.size) { index ->
-                                TicketCard(historyTickets[index])
+                                TicketCard(
+                                    ticket = historyTickets[index],
+                                    isExpiredView = isTicketExpired(historyTickets[index])
+                                )
                             }
                         }
                     }
@@ -165,9 +201,10 @@ fun TicketScreen(navController: NavHostController, selectedSeats: String = "", v
 
 @Composable
 fun TicketCard(
-    ticket: Ticket, 
+    ticket: Ticket,
     onRefundClick: ((Ticket) -> Unit)? = null,
-    onRescheduleClick: ((Ticket) -> Unit)? = null
+    onRescheduleClick: ((Ticket) -> Unit)? = null,
+    isExpiredView: Boolean = false
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -185,14 +222,16 @@ fun TicketCard(
                         Text("NOMOR TIKET", fontSize = 10.sp, fontWeight = FontWeight.Bold, color = TextSecondary)
                         Text(ticket.id, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
                     }
-                    val statusColor = when(ticket.status) {
-                        "Aktif" -> Color(0xFF4CAF50)
-                        "Refunded" -> Color(0xFFF44336)
-                        "Rescheduled" -> Color(0xFF2196F3)
+                    val displayStatus = if (isExpiredView && ticket.status == "Aktif") "Selesai" else ticket.status
+                    val statusColor = when {
+                        isExpiredView && ticket.status == "Aktif" -> TextSecondary
+                        ticket.status == "Aktif" -> Color(0xFF4CAF50)
+                        ticket.status == "Refunded" -> Color(0xFFF44336)
+                        ticket.status == "Rescheduled" -> Color(0xFF2196F3)
                         else -> TextSecondary
                     }
                     Surface(color = statusColor.copy(0.1f), shape = RoundedCornerShape(8.dp)) {
-                        Text(ticket.status.uppercase(), modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), fontSize = 10.sp, fontWeight = FontWeight.Bold, color = statusColor)
+                        Text(displayStatus.uppercase(), modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp), fontSize = 10.sp, fontWeight = FontWeight.Bold, color = statusColor)
                     }
                 }
                 
@@ -239,7 +278,7 @@ fun TicketCard(
                     Spacer(Modifier.height(8.dp))
                     Text("Scan saat masuk peron", fontSize = 10.sp, color = TextSecondary)
                     
-                    if (ticket.status == "Aktif" && onRefundClick != null && onRescheduleClick != null) {
+                    if (ticket.status == "Aktif" && !isExpiredView && onRefundClick != null && onRescheduleClick != null) {
                         Spacer(Modifier.height(20.dp))
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                             OutlinedButton(

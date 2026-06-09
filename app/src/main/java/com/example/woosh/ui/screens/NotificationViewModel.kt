@@ -17,6 +17,8 @@ class NotificationViewModel @Inject constructor(
     private val auth: FirebaseAuth
 ) : ViewModel() {
 
+    private var listenerRegistration: com.google.firebase.firestore.ListenerRegistration? = null
+
     private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
     val notifications: StateFlow<List<Notification>> = _notifications.asStateFlow()
 
@@ -31,7 +33,7 @@ class NotificationViewModel @Inject constructor(
         val userId = auth.currentUser?.uid ?: return
         _isLoading.value = true
         
-        firestore.collection("users")
+        listenerRegistration = firestore.collection("users")
             .document(userId)
             .collection("notifications")
             .orderBy("timestamp", Query.Direction.DESCENDING)
@@ -63,5 +65,10 @@ class NotificationViewModel @Inject constructor(
             .collection("notifications")
             .document(notificationId)
             .delete()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        listenerRegistration?.remove()
     }
 }

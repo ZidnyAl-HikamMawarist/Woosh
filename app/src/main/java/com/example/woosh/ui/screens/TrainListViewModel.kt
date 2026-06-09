@@ -41,16 +41,31 @@ class TrainListViewModel @Inject constructor() : ViewModel() {
                     val body = response.body()
                     val trainsList = body?.data?.map { trip ->
                         // Dynamic Pricing Logic: Increase price by 20% during peak hours (07-10 and 16-19)
-                        val timePart = trip.departureTime.split(" ")[1] // Get HH:mm:ss
-                        val hour = timePart.split(":")[0].toIntOrNull() ?: 0
+                        val rawDep = trip.departureTime.trim()
+                        val timePartDep = if (rawDep.contains(" ")) {
+                            rawDep.split(" ").getOrNull(1) ?: "00:00:00"
+                        } else {
+                            rawDep
+                        }
+                        val depTime = if (timePartDep.length >= 5) timePartDep.substring(0, 5) else timePartDep
+
+                        val hour = timePartDep.split(":").firstOrNull()?.toIntOrNull() ?: 0
                         val isPeakHour = hour in 7..10 || hour in 16..19
                         val finalPrice = if (isPeakHour) (trip.basePrice * 1.2).toLong() else trip.basePrice.toLong()
                         val formattedPrice = "Rp ${String.format("%,d", finalPrice).replace(',', '.')}"
 
+                        val rawArr = trip.arrivalTime.trim()
+                        val timePartArr = if (rawArr.contains(" ")) {
+                            rawArr.split(" ").getOrNull(1) ?: "00:00:00"
+                        } else {
+                            rawArr
+                        }
+                        val arrTime = if (timePartArr.length >= 5) timePartArr.substring(0, 5) else timePartArr
+
                         TrainData(
                             name = trip.trainName,
-                            dep = timePart.substring(0, 5), // HH:mm
-                            arr = trip.arrivalTime.split(" ")[1].substring(0, 5), // HH:mm
+                            dep = depTime,
+                            arr = arrTime,
                             price = formattedPrice,
                             trainClass = trip.trainClass,
                             tripId = trip.tripId

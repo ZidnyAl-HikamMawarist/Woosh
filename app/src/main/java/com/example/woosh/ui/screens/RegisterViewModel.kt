@@ -40,10 +40,11 @@ class RegisterViewModel @Inject constructor(
     fun register(name: String, email: String, phone: String, password: String) {
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
+            var userCreated: com.google.firebase.auth.FirebaseUser? = null
             try {
                 val authResult = auth.createUserWithEmailAndPassword(email, password).await()
-                val user = authResult.user
-                val userId = user?.uid
+                userCreated = authResult.user
+                val userId = userCreated?.uid
                 
                 if (userId != null) {
                     val userProfile = hashMapOf(
@@ -72,6 +73,11 @@ class RegisterViewModel @Inject constructor(
                 
                 _uiState.update { it.copy(isLoading = false, registerResult = RegisterResult.Success) }
             } catch (e: Exception) {
+                try {
+                    userCreated?.delete()?.await()
+                } catch (cleanupEx: Exception) {
+                    android.util.Log.e("RegisterViewModel", "Gagal membersihkan user setelah Firestore error", cleanupEx)
+                }
                 _uiState.update { 
                     it.copy(isLoading = false, registerResult = RegisterResult.Error(e.message ?: "Registrasi gagal")) 
                 }

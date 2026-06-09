@@ -37,7 +37,11 @@ class WhoosherPassViewModel @Inject constructor(
     }
 
     fun buyPass(passName: String, tripCount: Int, price: Long) {
-        val uid = auth.currentUser?.uid ?: return
+        val uid = auth.currentUser?.uid
+        if (uid == null) {
+            _uiState.update { it.copy(isLoading = false, purchaseResult = PurchaseResult.Error("Pengguna tidak terautentikasi")) }
+            return
+        }
         
         _uiState.update { it.copy(isLoading = true) }
         

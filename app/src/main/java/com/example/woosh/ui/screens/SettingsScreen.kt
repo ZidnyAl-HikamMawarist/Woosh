@@ -23,6 +23,7 @@ import com.example.woosh.utils.SecurityManager
 import com.example.woosh.utils.BiometricHelper
 import com.example.woosh.BuildConfig
 import com.example.woosh.ui.components.ContactItem
+import com.example.woosh.data.remote.RetrofitClient
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -260,19 +261,264 @@ fun SettingsScreen(
             
             // Section: Development (Only shown in Debug builds)
             if (BuildConfig.DEBUG) {
-                var serverUrl by remember { mutableStateOf(com.example.woosh.data.remote.RetrofitClient.getCurrentBaseUrl()) }
+                var serverUrl by remember { mutableStateOf(RetrofitClient.getCurrentBaseUrl()) }
+                var showServerConfigDialog by remember { mutableStateOf(false) }
+
+                // Update serverUrl ketika dialog ditutup
+                LaunchedEffect(showServerConfigDialog) {
+                    if (!showServerConfigDialog) {
+                        serverUrl = RetrofitClient.getCurrentBaseUrl()
+                    }
+                }
+
+                if (showServerConfigDialog) {
+                    var ipPresets by remember { mutableStateOf(RetrofitClient.getAvailableAddresses(context)) }
+                    var currentSelectedIp by remember { mutableStateOf(RetrofitClient.getSelectedIp()) }
+                    var customIpInput by remember { mutableStateOf("") }
+                    var isScanning by remember { mutableStateOf(false) }
+                    var scanResultMsg by remember { mutableStateOf<String?>(null) }
+                    
+                    AlertDialog(
+                        onDismissRequest = { showServerConfigDialog = false },
+                        title = {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Default.Dns, contentDescription = null, tint = WooshRed)
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Konfigurasi Server", fontWeight = FontWeight.Bold, color = TextPrimary, fontSize = 20.sp)
+                            }
+                        },
+                        text = {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .verticalScroll(rememberScrollState()),
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                Text(
+                                    "Pilih atau masukkan alamat IP/URL server backend Woosh (port default 8000).",
+                                    fontSize = 13.sp,
+                                    color = TextSecondary
+                                )
+
+                                // 1. Tombol Deteksi Otomatis (Subnet Scanning)
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(containerColor = OffWhite),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Column(
+                                        modifier = Modifier.padding(12.dp).fillMaxWidth(),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        if (isScanning) {
+                                            CircularProgressIndicator(color = WooshRed, modifier = Modifier.size(24.dp))
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text("Memindai subnet lokal...", fontSize = 12.sp, color = TextSecondary)
+                                        } else {
+                                            Button(
+                                                onClick = {
+                                                    isScanning = true
+                                                    scanResultMsg = null
+                                                    RetrofitClient.autoDiscoverServer(context) { foundIp ->
+                                                        isScanning = false
+                                                        if (foundIp != null) {
+                                                            scanResultMsg = "Berhasil! Server ditemukan di: $foundIp"
+                                                            currentSelectedIp = foundIp
+                                                            serverUrl = RetrofitClient.getCurrentBaseUrl()
+                                                            ipPresets = RetrofitClient.getAvailableAddresses(context)
+                                                        } else {
+                                                            scanResultMsg = "Server tidak ditemukan di jaringan lokal."
+                                                        }
+                                                    }
+                                                },
+                                                colors = ButtonDefaults.buttonColors(containerColor = WooshRed),
+                                                shape = RoundedCornerShape(8.dp),
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.size(16.dp))
+                                                Spacer(modifier = Modifier.width(8.dp))
+                                                Text("Deteksi Otomatis (Scan)", fontSize = 13.sp)
+                                            }
+                                        }
+                                        
+                                        scanResultMsg?.let { msg ->
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text(
+                                                text = msg,
+                                                fontSize = 12.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                color = if (msg.contains("Berhasil")) Color(0xFF2E7D32) else WooshRed
+                                            )
+                                        }
+                                    }
+                                }
+
+                                // 2. Daftar Preset
+                                Text("Daftar Alamat Tersedia:", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = TextPrimary)
+                                Column(
+                                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    ipPresets.forEach { preset ->
+                                        val isSelected = preset == currentSelectedIp
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clickable {
+                                                    currentSelectedIp = preset
+                                                    RetrofitClient.setSelectedIp(context, preset)
+                                                    serverUrl = RetrofitClient.getCurrentBaseUrl()
+                                                }
+                                                .padding(vertical = 4.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            RadioButton(
+                                                selected = isSelected,
+                                                onClick = {
+                                                    currentSelectedIp = preset
+                                                    RetrofitClient.setSelectedIp(context, preset)
+                                                    serverUrl = RetrofitClient.getCurrentBaseUrl()
+                                                },
+                                                colors = RadioButtonDefaults.colors(selectedColor = WooshRed)
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Column(modifier = Modifier.weight(1f)) {
+                                                Text(
+                                                    text = preset,
+                                                    fontSize = 14.sp,
+                                                    color = TextPrimary,
+                                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                                )
+                                                val label = when (preset) {
+                                                    "127.0.0.1" -> "ADB Port Forwarding (adb reverse)"
+                                                    "10.0.2.2" -> "Default Emulator"
+                                                    else -> if (preset.startsWith("http")) "Custom URL" else "IP Lokal / Custom"
+                                                }
+                                                Text(label, fontSize = 11.sp, color = TextSecondary)
+                                            }
+                                            
+                                            // Tampilkan ikon hapus hanya jika alamat bukan default presets
+                                            val isDefaultPreset = preset in listOf("127.0.0.1", "10.0.2.2", "192.168.1.100")
+                                            if (!isDefaultPreset) {
+                                                IconButton(
+                                                    onClick = {
+                                                        RetrofitClient.removeCustomAddress(context, preset)
+                                                        ipPresets = RetrofitClient.getAvailableAddresses(context)
+                                                        if (currentSelectedIp == preset) {
+                                                            currentSelectedIp = "127.0.0.1"
+                                                            RetrofitClient.setSelectedIp(context, "127.0.0.1")
+                                                            serverUrl = RetrofitClient.getCurrentBaseUrl()
+                                                        }
+                                                    },
+                                                    modifier = Modifier.size(24.dp)
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.Delete,
+                                                        contentDescription = "Hapus",
+                                                        tint = TextSecondary,
+                                                        modifier = Modifier.size(16.dp)
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // 3. Tambah Alamat Kustom Baru
+                                Text("Tambah Alamat/URL Kustom:", fontWeight = FontWeight.Bold, fontSize = 14.sp, color = TextPrimary)
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    OutlinedTextField(
+                                        value = customIpInput,
+                                        onValueChange = { customIpInput = it },
+                                        placeholder = { Text("Contoh: 192.168.1.15 atau https://ngrok...", fontSize = 12.sp) },
+                                        singleLine = true,
+                                        modifier = Modifier.weight(1f),
+                                        colors = OutlinedTextFieldDefaults.colors(
+                                            focusedBorderColor = WooshRed,
+                                            focusedLabelColor = WooshRed
+                                        ),
+                                        textStyle = LocalTextStyle.current.copy(fontSize = 13.sp)
+                                    )
+                                    Button(
+                                        onClick = {
+                                            if (customIpInput.isNotBlank()) {
+                                                val ip = customIpInput.trim()
+                                                RetrofitClient.addCustomAddress(context, ip)
+                                                RetrofitClient.setSelectedIp(context, ip)
+                                                currentSelectedIp = ip
+                                                serverUrl = RetrofitClient.getCurrentBaseUrl()
+                                                ipPresets = RetrofitClient.getAvailableAddresses(context)
+                                                customIpInput = ""
+                                            }
+                                        },
+                                        colors = ButtonDefaults.buttonColors(containerColor = WooshRed),
+                                        shape = RoundedCornerShape(8.dp),
+                                        contentPadding = PaddingValues(horizontal = 12.dp)
+                                    ) {
+                                        Text("Tambah", fontSize = 12.sp)
+                                    }
+                                }
+
+                                // 4. Informasi Tips ADB
+                                Card(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = CardDefaults.cardColors(containerColor = WooshRed.copy(alpha = 0.05f)),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(12.dp),
+                                        verticalAlignment = Alignment.Top
+                                    ) {
+                                        Icon(
+                                            Icons.Default.Info,
+                                            contentDescription = null,
+                                            tint = WooshRed,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Column {
+                                            Text(
+                                                "Tips ADB Port Forwarding:",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 12.sp,
+                                                color = WooshRed
+                                            )
+                                            Spacer(modifier = Modifier.height(2.dp))
+                                            Text(
+                                                "Jika menggunakan kabel USB / Wireless Debugging ke laptop, jalankan perintah berikut di komputer:\n\n" +
+                                                "adb reverse tcp:8000 tcp:8000\n\n" +
+                                                "Kemudian pilih alamat '127.0.0.1'. Koneksi akan otomatis terhubung secara instan tanpa peduli IP Wi-Fi berubah-ubah!",
+                                                fontSize = 11.sp,
+                                                color = TextPrimary,
+                                                lineHeight = 15.sp
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = { 
+                                showServerConfigDialog = false
+                            }) {
+                                Text("Tutup", color = WooshRed, fontWeight = FontWeight.Bold)
+                            }
+                        },
+                        containerColor = SurfaceWhite,
+                        shape = RoundedCornerShape(24.dp)
+                    )
+                }
+
                 SettingsSection(title = "Development") {
                     SettingsClickItem(
                         icon = Icons.Default.Dns,
                         title = "Konfigurasi Server",
-                        subtitle = serverUrl.removePrefix("http://").removeSuffix("/"),
+                        subtitle = serverUrl.removePrefix("http://").removePrefix("https://").removeSuffix("/"),
                         onClick = {
-                            val activity = context as? android.app.Activity
-                            if (activity != null) {
-                                com.example.woosh.data.remote.RetrofitClient.showIpSelector(activity) {
-                                    serverUrl = com.example.woosh.data.remote.RetrofitClient.getCurrentBaseUrl()
-                                }
-                            }
+                            showServerConfigDialog = true
                         }
                     )
                 }

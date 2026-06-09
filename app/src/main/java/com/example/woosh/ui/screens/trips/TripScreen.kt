@@ -98,16 +98,22 @@ fun TripCard(trip: TripItem) {
             Spacer(modifier = Modifier.height(8.dp))
             
             Row(verticalAlignment = Alignment.CenterVertically) {
+                val depDisplay = trip.departureTime.trim().let { raw ->
+                    if (raw.contains(" ")) raw.split(" ").getOrNull(1) ?: "00:00" else raw
+                }
+                val arrDisplay = trip.arrivalTime.trim().let { raw ->
+                    if (raw.contains(" ")) raw.split(" ").getOrNull(1) ?: "00:00" else raw
+                }
                 Column {
                     Text(text = "Berangkat", fontSize = 12.sp, color = TextSecondary)
-                    Text(text = trip.departureTime.split(" ")[1], fontWeight = FontWeight.Medium)
+                    Text(text = depDisplay, fontWeight = FontWeight.Medium)
                 }
                 Spacer(modifier = Modifier.width(24.dp))
                 Text(text = "➔", color = TextSecondary)
                 Spacer(modifier = Modifier.width(24.dp))
                 Column {
                     Text(text = "Tiba", fontSize = 12.sp, color = TextSecondary)
-                    Text(text = trip.arrivalTime.split(" ")[1], fontWeight = FontWeight.Medium)
+                    Text(text = arrDisplay, fontWeight = FontWeight.Medium)
                 }
             }
         }

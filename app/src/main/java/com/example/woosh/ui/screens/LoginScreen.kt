@@ -61,7 +61,7 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
     // Auto-trigger biometric if enabled
     LaunchedEffect(Unit) {
         if (securityManager.isBiometricEnabled() && biometricHelper.isBiometricAvailable()) {
-            val activity = context as? FragmentActivity
+            val activity = context.findFragmentActivity()
             activity?.let {
                 biometricHelper.showBiometricPrompt(
                     activity = it,
@@ -240,7 +240,7 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
                     Spacer(modifier = Modifier.width(12.dp))
                     IconButton(
                         onClick = {
-                            val activity = context as? FragmentActivity
+                            val activity = context.findFragmentActivity()
                             activity?.let {
                                 biometricHelper.showBiometricPrompt(
                                     activity = it,
@@ -315,4 +315,15 @@ fun LoginScreen(navController: NavHostController, viewModel: LoginViewModel = hi
             }
         }
     }
+}
+
+private fun android.content.Context.findFragmentActivity(): FragmentActivity? {
+    var currentContext = this
+    while (currentContext is android.content.ContextWrapper) {
+        if (currentContext is FragmentActivity) {
+            return currentContext
+        }
+        currentContext = currentContext.baseContext
+    }
+    return null
 }
